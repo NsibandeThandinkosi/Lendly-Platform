@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import {supabase } from './src/config/supabase.js';
 
+// Create the Express application
 const app = express();
 
 const port = process.env.PORT || 3000;
