@@ -10,16 +10,26 @@ git pull --no-rebase
 # How to correctly push to a new branch
 (check if you are in the new branch you created by running this command): git branch
 git add .
+
 git commit -m "Your commit message"
+
 git checkout -b {name of your new branch}
+
 git push origin {name of your new branch}
 
 # HOW TO RUN THE PROJECT LOCALLY
 # Run the following commands to install the necessary dependancies and to run the project
 npm install
+
 npm install express
+
 npm install express-session
+
 npm install @supabase/supabase-js
+
 npm install jsonwebtoken
+
 npm install axios
+
 npm start or node src/server.js
+
