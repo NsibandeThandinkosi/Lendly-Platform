@@ -1,0 +1,30 @@
+{
+  "name": "lendly-platform",
+  "version": "1.0.0",
+  "description": "A platform for registered micro lenders to store their user's loan information. It helps registered micro lenders keep basic records of who owes them, how much did they borrow and calculate the total to be paid, given the agreed upon legal interest rate.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NsibandeThandinkosi/Lendly-Platform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NsibandeThandinkosi/Lendly-Platform/issues"
+  },
+  "homepage": "https://github.com/NsibandeThandinkosi/Lendly-Platform#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
