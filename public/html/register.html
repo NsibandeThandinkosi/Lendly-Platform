@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | Lendly</title>
+
+    <link rel="stylesheet" href="../css/auth.css">
+</head>
+
+<body>
+
+    <main class="auth-page">
+
+        <!-- Left side -->
+        <section class="auth-info">
+
+            <a href="/index" class="auth-logo">
+                <span class="logo-icon">L</span>
+                Lendly
+            </a>
+
+            <div class="auth-info-content">
+
+                <span class="auth-label">
+                    JOIN LENDLY
+                </span>
+
+                <h1>
+                    Start managing your
+                    <strong>lending business.</strong>
+                </h1>
+
+                <p>
+                    Keep your borrowers, loans, interest and repayments
+                    organized in one secure platform.
+                </p>
+
+                <div class="auth-benefits">
+
+                    <div class="benefit">
+                        <span>✓</span>
+                        <p>Manage your borrowers</p>
+                    </div>
+
+                    <div class="benefit">
+                        <span>✓</span>
+                        <p>Track loans and repayments</p>
+                    </div>
+
+                    <div class="benefit">
+                        <span>✓</span>
+                        <p>Keep your lending records organized</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Right side -->
+        <section class="auth-form-section">
+
+            <div class="auth-form-container">
+
+                <div class="form-heading">
+
+                    <h2>Create your account</h2>
+
+                    <p>
+                        Already have an account?
+                        <a href="/login">Login</a>
+                    </p>
+
+                </div>
+
+
+                <form id="registerForm" novalidate>
+
+                    <!-- Personal Information -->
+
+                    <div class="form-section-title">
+                        Personal Information
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="input-group">
+
+                            <label for="firstName">
+                                First name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="firstName"
+                                name="firstName"
+                                placeholder="Enter your first name"
+                                required
+                            >
+
+                            <small class="error-message"></small>
+
+                        </div>
+
+
+                        <div class="input-group">
+
+                            <label for="lastName">
+                                Last name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="lastName"
+                                name="lastName"
+                                placeholder="Enter your last name"
+                                required
+                            >
+
+                            <small class="error-message"></small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="email">
+                            Email address
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            required
+                        >
+
+                        <small class="error-message"></small>
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="phone">
+                            Phone number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="e.g. 082 123 4567"
+                            required
+                        >
+
+                        <small class="error-message"></small>
+
+                    </div>
+
+
+                    <!-- Business Information -->
+
+                    <div class="form-section-title business-title">
+                        Business Information
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="businessName">
+                            Business name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="businessName"
+                            name="businessName"
+                            placeholder="Enter your registered business name"
+                            required
+                        >
+
+                        <small class="error-message"></small>
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="registrationNumber">
+                            Business registration number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="registrationNumber"
+                            name="registrationNumber"
+                            placeholder="Enter your registration number"
+                            required
+                        >
+
+                        <small class="input-hint">
+                            Your registered business registration number.
+                        </small>
+
+                        <small class="error-message"></small>
+
+                    </div>
+
+
+                    <div class="form-row">
+
+                        <div class="input-group">
+
+                            <label for="province">
+                                Province
+                            </label>
+
+                            <select
+                                id="province"
+                                name="province"
+                                required
+                            >
+                                <option value="">
+                                    Select province
+                                </option>
+
+                                <option value="Eastern Cape">
+                                    Eastern Cape
+                                </option>
+
+                                <option value="Free State">
+                                    Free State
+                                </option>
+
+                                <option value="Gauteng">
+                                    Gauteng
+                                </option>
+
+                                <option value="KwaZulu-Natal">
+                                    KwaZulu-Natal
+                                </option>
+
+                                <option value="Limpopo">
+                                    Limpopo
+                                </option>
+
+                                <option value="Mpumalanga">
+                                    Mpumalanga
+                                </option>
+
+                                <option value="Northern Cape">
+                                    Northern Cape
+                                </option>
+
+                                <option value="North West">
+                                    North West
+                                </option>
+
+                                <option value="Western Cape">
+                                    Western Cape
+                                </option>
+
+                            </select>
+
+                            <small class="error-message"></small>
+
+                        </div>
+
+
+                        <div class="input-group">
+
+                            <label for="businessType">
+                                Business type
+                            </label>
+
+                            <select
+                                id="businessType"
+                                name="businessType"
+                                required
+                            >
+                                <option value="">
+                                    Select type
+                                </option>
+
+                                <option value="Sole Proprietor">
+                                    Sole Proprietor
+                                </option>
+
+                                <option value="Private Company">
+                                    Private Company
+                                </option>
+
+                                <option value="Partnership">
+                                    Partnership
+                                </option>
+
+                                <option value="Other">
+                                    Other
+                                </option>
+
+                            </select>
+
+                            <small class="error-message"></small>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Password -->
+
+                    <div class="form-section-title security-title">
+                        Account Security
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="password">
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a strong password"
+                            required
+                        >
+
+                        <small class="input-hint">
+                            At least 8 characters, including a number.
+                        </small>
+
+                        <small class="error-message"></small>
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="confirmPassword">
+                            Confirm password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            placeholder="Re-enter your password"
+                            required
+                        >
+
+                        <small class="error-message"></small>
+
+                    </div>
+
+
+                    <!-- Verification notice -->
+
+                    <div class="verification-notice">
+
+                        <span>✓</span>
+
+                        <div>
+                            <strong>Business verification</strong>
+
+                            <p>
+                                Your business registration details will be
+                                recorded for verification. Your account will
+                                remain pending until the information has been
+                                reviewed.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Terms -->
+
+                    <label class="terms">
+
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            name="terms"
+                        >
+
+                        <span>
+                            I confirm that the information provided is
+                            accurate and that I operate a registered lending
+                            business.
+                        </span>
+
+                    </label>
+
+                    <small
+                        id="termsError"
+                        class="error-message"
+                    ></small>
+
+
+                    <button
+                        type="submit"
+                        class="auth-submit"
+                    >
+                        Create Lendly Account
+                        <span>→</span>
+                    </button>
+
+
+                    <div
+                        id="formMessage"
+                        class="form-message"
+                    ></div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="../js/register.js"></script>
+
+</body>
+
+</html>
