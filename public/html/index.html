@@ -351,11 +351,29 @@
                     <input
                         type="number"
                         id="loanAmount"
-                        value="10000"
-                        min="0"
+                        value="8000"
+                        min="100"
+                        max="8000"
                     >
                 </div>
             </div>
+
+            <!--new additions on the calculator-->
+            <div class="input-group">
+                <label for="loanDuration">Loan Duration (m)</label>
+
+                <div class="input-wrapper">
+                    <input
+                        type="number"
+                        id="loanDuration"
+                        value="1"
+                        min="1"
+                        max="6"
+                    >
+                    <span>months</span>
+                </div>
+            </div>
+
 
             <div class="input-group">
                 <label for="interestRate">Interest rate (%)</label>
@@ -364,11 +382,28 @@
                     <input
                         type="number"
                         id="interestRate"
-                        value="10"
+                        value="5"
                         min="0"
                         step="0.1"
+                        max="5"
                     >
                     <span>%</span>
+                </div>
+            </div>
+
+            <!--new additions on the calculator-->
+            <div class="input-group">
+                <label for="serviceFee">Monthly Service Fee</label>
+
+                <div class="input-wrapper">
+                    <span>R</span>
+                    <input
+                        type="number"
+                        id="serviceFee"
+                        value="60"
+                        min="0"
+                        max="60"
+                    >
                 </div>
             </div>
 
@@ -381,24 +416,35 @@
 
         <div class="calculator-result">
 
-            <p>Total repayment</p>
+            <div class="payment">
+                <div>
+                    <p>Total repayment</p>
 
-            <h3 id="totalRepayment">R11,000.00</h3>
+                    <h3 id="totalRepayment">R9,325.00</h3>
+                </div>
+                <div>
+                    <p>Monthly payment</p>
+
+                    <h3 id="monthlyPayment">R9,325.00</h3>
+                </div>
+
+
+            </div>
 
             <div class="result-details">
 
                 <div>
                     <span>Amount borrowed</span>
-                    <strong id="displayAmount">R10,000.00</strong>
+                    <strong id="displayAmount">R8,000.00</strong>
                 </div>
 
                 <div>
-                    <span>Interest</span>
-                    <strong id="displayInterest">R1,000.00</strong>
+                    <span>Total interest</span>
+                    <strong id="displayInterest">R1,325.00</strong>
+
                 </div>
-
             </div>
-
+            
         </div>
 
     </div>

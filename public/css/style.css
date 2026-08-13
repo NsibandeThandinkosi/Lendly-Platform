@@ -954,8 +954,10 @@ body {
 }
 
 .calculator-form {
-    display: grid;
-    gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Places inputs 2 per row */
+  gap: 12px 16px; /* Row gap x Column gap */
+  margin-bottom: 20px;
 }
 
 .input-group label {
@@ -1009,6 +1011,7 @@ body {
     background: transparent;
 }
 
+
 .calculate-btn {
     border: none;
 
@@ -1030,6 +1033,7 @@ body {
     cursor: pointer;
 
     transition: 0.3s;
+    grid-column: 1 / -1; 
 }
 
 .calculate-btn:hover {
@@ -1064,6 +1068,12 @@ body {
 
     font-size: 32px;
 
+    margin-bottom: 20px;
+}
+.payment {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Places inputs 2 per row */
+    gap: 12px 16px; /* Row gap x Column gap */
     margin-bottom: 20px;
 }
 
