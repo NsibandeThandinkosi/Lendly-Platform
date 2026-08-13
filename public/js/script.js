@@ -62,9 +62,32 @@ if (calculateBtn) {
 
         const interest =
             loanAmount * (interestRate / 100);
+        
+        const loanDuration = 
+            parseFloat(document.getElementById("loanDuration").value) || 0;
+        
+        const serviceFee = 
+            parseFloat(document.getElementById("serviceFee").value) || 0;
+        const totalServiceFee = 
+            serviceFee *loanDuration;
+
+        function getInitiationFee(loanAmount){
+            if (loanAmount > 1000){
+                return 165 + (loanAmount - 1000)*0.1;
+            }else{
+                return 165;
+            }
+        };
+        const initiationFee = getInitiationFee(loanAmount);
 
         const total =
-            loanAmount + interest;
+            loanAmount + interest + totalServiceFee + initiationFee;
+        
+        const monthlyPayment = 
+            total/loanDuration;
+
+        const totalInterest = 
+            total - loanAmount;
 
 
         document.getElementById("totalRepayment").textContent =
@@ -80,7 +103,13 @@ if (calculateBtn) {
             })}`;
 
         document.getElementById("displayInterest").textContent =
-            `R${interest.toLocaleString("en-ZA", {
+            `R${totalInterest.toLocaleString("en-ZA", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`;
+
+        document.getElementById("monthlyPayment").textContent =
+            `R${monthlyPayment.toLocaleString("en-ZA", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             })}`;
