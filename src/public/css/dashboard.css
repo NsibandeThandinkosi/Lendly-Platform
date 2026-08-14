@@ -1,0 +1,941 @@
+/* ============================================================
+   GLOBAL
+============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+
+:root {
+    --navy: #0a2d55;
+    --navy-dark: #061f3b;
+
+    --blue: #1769ff;
+    --cyan: #18cdb2;
+
+    --muted: #7d8da3;
+
+    --background: #f5f8fc;
+
+    --border: #e7edf4;
+
+    --white: #ffffff;
+}
+
+
+body {
+    margin: 0;
+
+    min-height: 100vh;
+
+    background: var(--background);
+
+    color: var(--navy);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+
+/* ============================================================
+   PAGE
+============================================================ */
+
+.dashboard-page {
+    min-height: 100vh;
+
+    display: flex;
+}
+
+
+/* ============================================================
+   SIDEBAR
+============================================================ */
+
+.sidebar {
+    width: 240px;
+
+    min-height: 100vh;
+
+    background: var(--navy);
+
+    color: white;
+
+    padding: 28px 18px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    position: fixed;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+
+/* ============================================================
+   LENDLY LOGO
+============================================================ */
+
+.logo {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    text-decoration: none;
+
+    color: white;
+
+    font-size: 26px;
+
+    font-weight: 800;
+
+    padding: 0 12px;
+
+    margin-bottom: 45px;
+}
+
+
+.logo-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: linear-gradient(
+        135deg,
+        var(--blue),
+        var(--cyan)
+    );
+
+    color: white;
+
+    font-size: 20px;
+}
+
+
+.sidebar-nav {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+.nav-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 13px 14px;
+
+    border-radius: 9px;
+
+    color: #aebfd2;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+
+    color: white;
+}
+
+
+.nav-item.active {
+    background: rgba(23, 105, 255, 0.22);
+
+    color: white;
+}
+
+
+.nav-icon {
+    width: 20px;
+
+    text-align: center;
+
+    font-size: 15px;
+}
+
+
+.sidebar-bottom {
+    margin-top: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+/* ============================================================
+   MAIN CONTENT
+============================================================ */
+
+.main-content {
+    width: calc(100% - 240px);
+
+    margin-left: 240px;
+
+    min-height: 100vh;
+}
+
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+
+.topbar {
+    height: 86px;
+
+    padding: 0 40px;
+
+    background: white;
+
+    border-bottom: 1px solid var(--border);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+
+.page-label {
+    margin: 0 0 4px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+
+.topbar h1 {
+    margin: 0;
+
+    font-size: 22px;
+
+    color: var(--navy);
+}
+
+
+.topbar-right {
+    display: flex;
+
+    align-items: center;
+
+    gap: 24px;
+}
+
+
+.notification-button {
+    width: 38px;
+    height: 38px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    background: white;
+
+    color: var(--navy);
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+
+.notification-button:hover {
+    background: #f5f8fc;
+}
+
+
+.user-profile {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.user-avatar {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: #e5efff;
+
+    color: var(--blue);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.user-profile strong {
+    display: block;
+
+    font-size: 12px;
+}
+
+
+.user-profile span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   DASHBOARD CONTENT
+============================================================ */
+
+.dashboard-content {
+    padding: 32px 40px;
+}
+
+
+/* ============================================================
+   SUMMARY CARDS
+============================================================ */
+
+.summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 24px;
+}
+
+
+.summary-card {
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 4px 15px rgba(25, 55, 90, 0.04);
+}
+
+
+.summary-card.clickable {
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.summary-card.clickable:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(25, 55, 90, 0.08);
+}
+
+
+.summary-top {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+}
+
+
+.summary-card p {
+    margin: 0 0 8px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+.summary-card h2 {
+    margin: 0;
+
+    color: var(--navy);
+
+    font-size: 25px;
+}
+
+
+.summary-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: 700;
+}
+
+
+.summary-icon.blue {
+    background: #e5efff;
+
+    color: var(--blue);
+}
+
+
+.summary-icon.green {
+    background: #e2faf4;
+
+    color: #0fae8f;
+}
+
+
+.summary-icon.orange {
+    background: #fff3df;
+
+    color: #e89a22;
+}
+
+
+.summary-bottom {
+    display: flex;
+
+    gap: 5px;
+
+    margin-top: 17px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+.positive {
+    color: #0fae8f;
+
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   LOWER DASHBOARD
+============================================================ */
+
+.dashboard-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 24px;
+}
+
+
+.panel {
+    position: relative;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    padding: 24px;
+
+    box-shadow:
+        0 4px 15px rgba(25, 55, 90, 0.04);
+}
+
+
+.panel-header {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    margin-bottom: 30px;
+}
+
+
+.panel-label {
+    margin: 0 0 5px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+.panel h2 {
+    margin: 0;
+
+    font-size: 17px;
+
+    color: var(--navy);
+}
+
+
+/* ============================================================
+   View Details
+============================================================ */
+
+#detailsButton {
+    border: none;
+    padding: 15px;
+
+    border-radius: 9px;
+
+    background: linear-gradient(
+        135deg,
+        var(--navy),
+        #4086ff
+    );
+
+    color: white;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+
+#detailsButton:hover {
+    background: linear-gradient(
+        135deg,
+        #9aa8bb,
+        #4086ff
+    );
+}
+
+
+/* ============================================================
+   COLLECTION PROGRESS
+============================================================ */
+
+.progress-info {
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 8px;
+
+    margin-bottom: 14px;
+}
+
+
+.progress-info strong {
+    font-size: 36px;
+
+    color: var(--navy);
+}
+
+
+.progress-info span {
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+.large-progress-bar {
+    width: 100%;
+
+    height: 10px;
+
+    border-radius: 20px;
+
+    background: #e8eef6;
+
+    overflow: hidden;
+}
+
+
+.large-progress {
+    width: 82%;
+
+    height: 100%;
+
+    border-radius: 20px;
+
+    background: linear-gradient(
+        90deg,
+        var(--blue),
+        var(--cyan)
+    );
+}
+
+
+.progress-numbers {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 24px;
+}
+
+
+.progress-numbers div {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.progress-numbers span {
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+.progress-numbers strong {
+    color: var(--navy);
+
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   VIEW ALL
+============================================================ */
+
+.view-all-button {
+    border: none;
+    padding: 15px;
+
+    border-radius: 9px;
+
+    background: linear-gradient(
+        135deg,
+        var(--navy),
+        #4086ff
+    );
+
+    color: white;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+
+.view-all-button:hover {
+    background: linear-gradient(
+        135deg,
+        #9aa8bb,
+        #4086ff
+    );
+}
+
+
+/* ============================================================
+   LOAN LIST
+============================================================ */
+
+.loan-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.loan-item {
+    display: flex;
+
+    align-items: center;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #eef2f6;
+}
+
+
+.loan-item:last-child {
+    border-bottom: 0;
+}
+
+
+.borrower-avatar {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #edf3fb;
+
+    color: var(--navy);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    margin-right: 10px;
+}
+
+
+.loan-info {
+    flex: 1;
+}
+
+
+.loan-info strong {
+    display: block;
+
+    color: var(--navy);
+
+    font-size: 11px;
+}
+
+
+.loan-info span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+}
+
+
+.loan-amount {
+    text-align: right;
+}
+
+
+.loan-amount strong {
+    display: block;
+
+    color: var(--navy);
+
+    font-size: 11px;
+}
+
+
+.status {
+    display: inline-block;
+
+    margin-top: 4px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+
+.status.active {
+    color: var(--blue);
+}
+
+
+.status.paid {
+    color: #0fae8f;
+}
+
+
+.status.overdue {
+    color: #e89a22;
+}
+
+
+/* ============================================================
+   MESSAGE
+============================================================ */
+
+.dashboard-message {
+    position: fixed;
+
+    right: 30px;
+
+    bottom: 30px;
+
+    padding: 12px 18px;
+
+    background: var(--navy);
+
+    color: white;
+
+    border-radius: 8px;
+
+    font-size: 11px;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform: translateY(10px);
+
+    transition: 0.2s ease;
+
+    z-index: 100;
+}
+
+
+.dashboard-message.show {
+    opacity: 1;
+
+    visibility: visible;
+
+    transform: translateY(0);
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1100px) {
+
+    .summary-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 750px) {
+
+    .sidebar {
+        width: 70px;
+
+        padding: 25px 10px;
+    }
+
+
+    .logo {
+        font-size: 0;
+
+        text-align: center;
+
+        padding: 0;
+
+        margin-bottom: 35px;
+    }
+
+
+    .logo span {
+        font-size: 20px;
+    }
+
+
+    .nav-item {
+        justify-content: center;
+
+        padding: 13px 8px;
+    }
+
+
+    .nav-item {
+        font-size: 0;
+    }
+
+
+    .nav-icon {
+        font-size: 16px;
+    }
+
+
+    .main-content {
+        width: calc(100% - 70px);
+
+        margin-left: 70px;
+    }
+
+
+    .topbar {
+        padding: 0 20px;
+    }
+
+
+    .dashboard-content {
+        padding: 24px 20px;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .topbar-right {
+        gap: 8px;
+    }
+
+
+    .user-profile > div:last-child {
+        display: none;
+    }
+
+}
