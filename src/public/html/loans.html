@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Loans - Lendly</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/dashboard.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="dashboard-page">
+
+
+        <!-- ==================================================
+             SIDEBAR
+        =================================================== -->
+
+        <aside class="sidebar">
+
+            <a href="dashboard.html" class="logo">
+
+                <span class="logo-icon">
+                    L
+                </span>
+
+                Lendly
+
+            </a>
+
+
+            <nav class="sidebar-nav">
+
+
+                <!-- Dashboard -->
+
+                <a
+                    href="dashboard.html"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ▦
+                    </span>
+
+                    Dashboard
+
+                </a>
+
+
+                <!-- Loans -->
+
+                <a
+                    href="loans.html"
+                    class="nav-item active"
+                >
+
+                    <span class="nav-icon">
+                        ↗
+                    </span>
+
+                    Loans
+
+                </a>
+
+
+                <!-- Collections -->
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ✓
+                    </span>
+
+                    Collections
+
+                </a>
+
+
+                <!-- Borrowers -->
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ♙
+                    </span>
+
+                    Borrowers
+
+                </a>
+
+
+            </nav>
+
+        </aside>
+
+
+
+        <!-- ==================================================
+             MAIN CONTENT
+        =================================================== -->
+
+        <main class="main-content">
+
+
+            <!-- TOPBAR -->
+
+            <header class="topbar">
+
+                <div>
+
+                    <p class="page-label">
+                        Lending
+                    </p>
+
+                    <h1>
+                        Loans
+                    </h1>
+
+                </div>
+
+
+                <!-- PROFILE BUTTON -->
+
+                <div class="topbar-right">
+
+                    <button
+                        class="user-profile"
+                        id="profileButton"
+                    >
+
+                        <div class="user-avatar">
+                            TN
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Admin
+                            </strong>
+
+                            <span>
+                                Loan Manager
+                            </span>
+
+                        </div>
+
+                    </button>
+
+                </div>
+
+            </header>
+
+
+
+            <!-- ==================================================
+                 LOANS CONTENT
+            =================================================== -->
+
+            <section class="loans-content">
+
+
+                <!-- PAGE HEADER -->
+
+                <div class="loans-page-header">
+
+                    <div>
+
+                        <p class="panel-label">
+                            Active lending
+                        </p>
+
+                        <h2>
+                            Active Loans
+                        </h2>
+
+                        <p class="loans-description">
+                            Manage active and overdue loans,
+                            record payments and update loan details.
+                        </p>
+
+                    </div>
+
+
+                    <div class="loan-summary">
+
+                        <div class="loan-summary-item">
+
+                            <span>
+                                Active
+                            </span>
+
+                            <strong id="activeLoanCount">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="loan-summary-item overdue-summary">
+
+                            <span>
+                                Overdue
+                            </span>
+
+                            <strong id="overdueLoanCount">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     LOAN LIST
+                =================================================== -->
+
+                <div
+                    class="loans-list"
+                    id="loansList"
+                >
+
+                    <!-- JavaScript will insert loans here -->
+
+                </div>
+
+
+
+                <!-- EMPTY STATE -->
+
+                <div
+                    class="loans-empty"
+                    id="loansEmpty"
+                >
+
+                    <div class="loans-empty-icon">
+                        ✓
+                    </div>
+
+                    <h3>
+                        No active loans
+                    </h3>
+
+                    <p>
+                        All loans have been collected.
+                    </p>
+
+                </div>
+
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+
+    <script src="../js/profile.js"></script>
+
+    <script src="../js/loans.js"></script>
+
+
+</body>
+
+</html>
