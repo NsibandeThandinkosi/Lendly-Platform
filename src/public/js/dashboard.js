@@ -39,17 +39,6 @@ const progressTextElement =
 const progressElement =
     document.getElementById("progress");
 
-
-const menuButton =
-    document.getElementById("menuButton");
-
-const menuDropdown =
-    document.getElementById("menuDropdown");
-
-
-const refreshButton =
-    document.getElementById("refreshButton");
-
 const detailsButton =
     document.getElementById("detailsButton");
 
@@ -63,6 +52,10 @@ const collectedCard =
 
 const notificationButton =
     document.getElementById("notificationButton");
+
+
+const profileButton =
+    document.getElementById("profileButton");
 
 const viewAllButton =
     document.getElementById("viewAllButton");
@@ -176,83 +169,12 @@ function showMessage(message) {
 
 
 // ============================================================
-// THREE DOT MENU
-// ============================================================
-
-menuButton.addEventListener(
-    "click",
-    function(event) {
-
-        event.stopPropagation();
-
-        menuDropdown.classList.toggle(
-            "open"
-        );
-
-    }
-);
-
-
-// ============================================================
-// CLOSE MENU WHEN CLICKING OUTSIDE
-// ============================================================
-
-document.addEventListener(
-    "click",
-    function(event) {
-
-        if (
-            !event.target.closest(
-                ".panel-header"
-            )
-        ) {
-
-            menuDropdown.classList.remove(
-                "open"
-            );
-
-        }
-
-    }
-);
-
-
-// ============================================================
-// REFRESH
-// ============================================================
-
-refreshButton.addEventListener(
-    "click",
-    function() {
-
-        renderDashboard();
-
-
-        menuDropdown.classList.remove(
-            "open"
-        );
-
-
-        showMessage(
-            "Dashboard data refreshed"
-        );
-
-    }
-);
-
-
-// ============================================================
 // VIEW DETAILS
 // ============================================================
 
 detailsButton.addEventListener(
     "click",
     function() {
-
-        menuDropdown.classList.remove(
-            "open"
-        );
-
 
         showMessage(
             `${dashboardData.activeLoans} active loans with ${dashboardData.collectionProgress}% collected`
@@ -302,13 +224,24 @@ notificationButton.addEventListener(
     "click",
     function() {
 
-        showMessage(
-            "You have 3 new notifications"
-        );
+        window.location.href = "notifications.html";
 
     }
 );
 
+
+// ============================================================
+// USER PROFILE
+// ============================================================
+
+profileButton.addEventListener(
+    "click",
+    function() {
+
+        window.location.href = "profile.html";
+
+    }
+);
 
 // ============================================================
 // VIEW ALL LOANS
