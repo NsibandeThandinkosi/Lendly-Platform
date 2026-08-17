@@ -224,9 +224,7 @@ notificationButton.addEventListener(
     "click",
     function() {
 
-        showMessage(
-            "You have 3 new notifications"
-        );
+        window.location.href = "notifications.html";
 
     }
 );
