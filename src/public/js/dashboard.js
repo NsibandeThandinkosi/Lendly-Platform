@@ -195,6 +195,7 @@ activeLoansCard.addEventListener(
         showMessage(
             `You currently have ${dashboardData.activeLoans} active loans`
         );
+        window.location.href = "loans.html";
 
     }
 );
@@ -254,6 +255,7 @@ viewAllButton.addEventListener(
         showMessage(
             "Opening all loans..."
         );
+        window.location.href = "loans.html";
 
     }
 );
