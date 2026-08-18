@@ -11,6 +11,9 @@ const notificationCount =
 const emptyNotifications =
     document.getElementById("emptyNotifications");
 
+const profileButton =
+    document.getElementById("profileButton");
+
 
 // ============================================================
 // UPDATE NOTIFICATION COUNT
@@ -95,6 +98,20 @@ deleteButtons.forEach(
 
     }
 );
+// ============================================================
+// USER PROFILE
+// ============================================================
+
+profileButton.addEventListener(
+    "click",
+    function() {
+
+        window.location.href = "profile.html";
+
+    }
+);
+
+
 
 
 // ============================================================
