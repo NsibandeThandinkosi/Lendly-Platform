@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Collection Details - Lendly</title>
+
+
+    <!-- SHARED STYLES -->
+
+    <link
+        rel="stylesheet"
+        href="../css/innerStyle.css"
+    >
+
+
+    <!-- COLLECTION DETAILS STYLES -->
+
+    <link
+        rel="stylesheet"
+        href="../css/collection-detail.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <div class="dashboard-page">
+
+
+        <!-- ==================================================
+             SIDEBAR
+        =================================================== -->
+
+        <aside class="sidebar">
+
+
+            <a
+                href="dashboard.html"
+                class="logo"
+            >
+
+                <span class="logo-icon">
+                    L
+                </span>
+
+                Lendly
+
+            </a>
+
+
+            <nav class="sidebar-nav">
+
+
+                <!-- Dashboard -->
+
+                <a
+                    href="dashboard.html"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ▦
+                    </span>
+
+                    Dashboard
+
+                </a>
+
+
+                <!-- Loans -->
+
+                <a
+                    href="loans.html"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ↗
+                    </span>
+
+                    Loans
+
+                </a>
+
+
+                <!-- Collections -->
+
+                <a
+                    href="collections.html"
+                    class="nav-item active"
+                >
+
+                    <span class="nav-icon">
+                        ✓
+                    </span>
+
+                    Collections
+
+                </a>
+
+
+                <!-- Borrowers -->
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ♙
+                    </span>
+
+                    Borrowers
+
+                </a>
+
+
+            </nav>
+
+
+        </aside>
+
+
+
+        <!-- ==================================================
+             MAIN CONTENT
+        =================================================== -->
+
+        <main class="main-content">
+
+
+            <!-- ==================================================
+                 TOPBAR
+            =================================================== -->
+
+            <header class="topbar">
+
+
+                <div>
+
+                    <p class="page-label">
+                        Collections
+                    </p>
+
+                    <h1>
+                        Collection Details
+                    </h1>
+
+                </div>
+
+
+                <div class="topbar-right">
+
+
+                    <!--Notifications-->
+                    <button
+                        class="notification-button"
+                        onclick="window.location.href='notifications.html'"
+                    >
+                        ♧
+                    </button>
+
+                    <!-- Profile -->
+
+                    <button
+                        class="user-profile"
+                        onclick="window.location.href='profile.html'"
+                    >
+
+                        <div class="user-avatar">
+                            TN
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Thandinkosi
+                            </strong>
+
+                            <span>
+                                Account
+                            </span>
+
+                        </div>
+
+                    </button>
+
+
+                </div>
+
+
+            </header>
+
+
+
+            <!-- ==================================================
+                 COLLECTION DETAILS
+            =================================================== -->
+
+            <section class="collection-details-content">
+
+
+                <!-- BACK BUTTON -->
+
+                <a
+                    href="collections.html"
+                    class="back-to-collections"
+                >
+
+                    ← Back to Collections
+
+                </a>
+
+
+
+                <!-- ==================================================
+                     COLLECTION HEADER
+                =================================================== -->
+
+                <div class="collection-detail-header">
+
+
+                    <div class="collection-detail-borrower">
+
+
+                        <div
+                            class="collection-detail-avatar"
+                            id="borrowerAvatar"
+                        >
+                            --
+                        </div>
+
+
+                        <div>
+
+                            <p class="detail-label">
+                                Fully Collected Loan
+                            </p>
+
+                            <h2 id="borrowerName">
+                                Loading...
+                            </h2>
+
+                            <span id="loanNumber">
+                                Loan #--
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- STATUS -->
+
+                    <div class="collection-status">
+
+                        <span class="status-dot"></span>
+
+                        Fully Collected
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     LOAN OVERVIEW
+                =================================================== -->
+
+                <div class="collection-overview">
+
+
+                    <div class="overview-card">
+
+
+                        <span>
+                            Original Loan
+                        </span>
+
+                        <strong id="originalLoan">
+                            R0
+                        </strong>
+
+
+                    </div>
+
+
+
+                    <div class="overview-card">
+
+
+                        <span>
+                            Total Paid
+                        </span>
+
+                        <strong id="totalPaid">
+                            R0
+                        </strong>
+
+
+                    </div>
+
+
+
+                    <div class="overview-card">
+
+
+                        <span>
+                            Loan Started
+                        </span>
+
+                        <strong id="startDate">
+                            --
+                        </strong>
+
+
+                    </div>
+
+
+
+                    <div class="overview-card">
+
+
+                        <span>
+                            Fulfilled
+                        </span>
+
+                        <strong id="fulfilledDate">
+                            --
+                        </strong>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     BORROWER INFORMATION
+                =================================================== -->
+
+                <div class="detail-section">
+
+
+                    <div class="section-heading">
+
+                        <div>
+
+                            <h3>
+                                Borrower Information
+                            </h3>
+
+                            <p>
+                                Information recorded when the loan was created.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="detail-grid">
+
+
+                        <div class="detail-field">
+
+                            <span>
+                                Full name
+                            </span>
+
+                            <strong id="detailBorrowerName">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-field">
+
+                            <span>
+                                Phone number
+                            </span>
+
+                            <strong id="borrowerPhone">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-field">
+
+                            <span>
+                                Email
+                            </span>
+
+                            <strong id="borrowerEmail">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-field">
+
+                            <span>
+                                Borrower ID
+                            </span>
+
+                            <strong id="borrowerId">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     PAYMENT HISTORY
+                =================================================== -->
+
+                <div class="detail-section">
+
+
+                    <div class="section-heading">
+
+
+                        <div>
+
+                            <h3>
+                                Payment History
+                            </h3>
+
+                            <p>
+                                All payments recorded for this loan.
+                            </p>
+
+                        </div>
+
+
+                        <strong
+                            class="payment-total"
+                            id="paymentTotal"
+                        >
+                            R0
+                        </strong>
+
+
+                    </div>
+
+
+
+                    <div class="payment-table-wrapper">
+
+
+                        <table class="payment-table">
+
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Payment
+                                    </th>
+
+                                    <th>
+                                        Date
+                                    </th>
+
+                                    <th>
+                                        Method
+                                    </th>
+
+                                    <th>
+                                        Amount
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="paymentHistory">
+
+                                <!-- JavaScript inserts payments -->
+
+                            </tbody>
+
+
+                        </table>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     ACTIONS
+                =================================================== -->
+
+                <div class="collection-detail-actions">
+
+
+                    <button
+                        class="delete-record-button"
+                        id="deleteRecordButton"
+                    >
+
+                        Delete Record
+
+                    </button>
+
+
+                </div>
+
+
+            </section>
+
+
+        </main>
+
+
+    </div>
+
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="../js/collection-detail.js"></script>
+
+
+</body>
+
+</html>
