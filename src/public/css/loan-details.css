@@ -1,0 +1,410 @@
+
+/* ============================================================
+   LOAN DETAILS PAGE
+============================================================ */
+
+.loan-details-content {
+    padding: 35px 40px 50px;
+}
+
+
+.back-to-loans {
+    display: inline-block;
+
+    margin-bottom: 22px;
+
+    color: var(--muted);
+
+    text-decoration: none;
+
+    font-size: 11px;
+}
+
+
+.back-to-loans:hover {
+    color: var(--blue);
+}
+
+
+/* ============================================================
+   DETAILS CARD
+============================================================ */
+
+.loan-details-card {
+    width: 100%;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 15px rgba(25, 55, 90, 0.04);
+
+    overflow: hidden;
+}
+
+
+.loan-details-header {
+    padding: 30px 35px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    border-bottom: 1px solid var(--border);
+}
+
+
+.loan-details-borrower {
+    display: flex;
+
+    align-items: center;
+
+    gap: 17px;
+}
+
+
+.loan-details-avatar {
+    width: 58px;
+    height: 58px;
+
+    border-radius: 50%;
+
+    background: #e5efff;
+
+    color: var(--blue);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: 700;
+}
+
+
+.loan-details-header h2 {
+    margin: 0 0 5px;
+
+    color: var(--navy);
+
+    font-size: 20px;
+}
+
+
+.loan-details-header p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   DETAILS STATUS
+============================================================ */
+
+.loan-details-status {
+    padding: 7px 11px;
+
+    border-radius: 7px;
+
+    background: #e2faf4;
+
+    color: #0fae8f;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+
+.loan-details-status.overdue {
+    background: #fff1f1;
+
+    color: #d76565;
+}
+
+
+/* ============================================================
+   DETAILS BODY
+============================================================ */
+
+.loan-details-body {
+    padding: 35px;
+}
+
+
+.loan-details-section {
+    margin-bottom: 35px;
+}
+
+
+.loan-details-section:last-child {
+    margin-bottom: 0;
+}
+
+
+.loan-details-section h3 {
+    margin: 0 0 18px;
+
+    color: var(--navy);
+
+    font-size: 14px;
+}
+
+
+.loan-details-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 14px;
+}
+
+
+.loan-detail-field {
+    padding: 17px 19px;
+
+    background: #f8fafc;
+
+    border: 1px solid #edf1f5;
+
+    border-radius: 10px;
+}
+
+
+.loan-detail-field span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+}
+
+
+.loan-detail-field strong {
+    color: var(--navy);
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   DETAILS ACTIONS
+============================================================ */
+
+.loan-details-actions {
+    padding: 25px 35px;
+
+    border-top: 1px solid var(--border);
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 9px;
+}
+
+
+.loan-details-action {
+    padding: 10px 16px;
+
+    border-radius: 7px;
+
+    border: 1px solid #e5ebf2;
+
+    background: white;
+
+    color: var(--navy);
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.loan-details-action.payment {
+    background: #e2faf4;
+
+    border-color: #d0f3ea;
+
+    color: #0fae8f;
+}
+
+
+.loan-details-action.clear {
+    background: #e5efff;
+
+    border-color: #d8e6fa;
+
+    color: var(--blue);
+}
+
+
+.loan-details-action:hover {
+    opacity: 0.85;
+}
+
+
+/* ============================================================
+   EDIT FORM
+============================================================ */
+
+.loan-edit-form {
+    display: none;
+
+    margin-top: 25px;
+
+    padding-top: 30px;
+
+    border-top: 1px solid var(--border);
+}
+
+
+.loan-edit-form.visible {
+    display: block;
+}
+
+
+.loan-edit-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 18px;
+}
+
+
+.loan-edit-field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.loan-edit-field label {
+    color: var(--muted);
+
+    font-size: 9px;
+}
+
+
+.loan-edit-field input {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 11px 12px;
+
+    border: 1px solid #e1e8f0;
+
+    border-radius: 7px;
+
+    outline: none;
+
+    color: var(--navy);
+
+    font-size: 11px;
+}
+
+
+.loan-edit-field input:focus {
+    border-color: var(--blue);
+}
+
+
+.save-loan-button {
+    margin-top: 20px;
+
+    padding: 10px 18px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: var(--navy);
+
+    color: white;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+
+@media (max-width: 850px) {
+
+    .loan-details-content {
+        padding: 25px 20px;
+    }
+
+
+    .loan-details-header {
+        padding: 25px;
+    }
+
+
+    .loan-details-body {
+        padding: 25px;
+    }
+
+
+    .loan-details-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+
+    .loan-edit-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .loan-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .loan-details-header {
+        align-items: flex-start;
+
+        gap: 15px;
+
+        flex-direction: column;
+    }
+
+
+    .loan-details-actions {
+        padding: 20px;
+
+        flex-wrap: wrap;
+
+        justify-content: flex-start;
+    }
+
+}

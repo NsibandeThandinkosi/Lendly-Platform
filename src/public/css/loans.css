@@ -1,0 +1,537 @@
+/* ============================================================
+   LOANS PAGE
+============================================================ */
+
+.loans-content {
+    padding: 40px;
+}
+
+
+/* ============================================================
+   LOANS PAGE HEADER
+============================================================ */
+
+.loans-page-header {
+    width: 100%;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    margin-bottom: 28px;
+}
+
+
+.loans-page-header h2 {
+    margin: 0 0 7px;
+
+    color: var(--navy);
+
+    font-size: 21px;
+}
+
+
+.loans-description {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+/* ============================================================
+   LOAN SUMMARY
+============================================================ */
+
+.loan-summary {
+    display: flex;
+
+    gap: 10px;
+}
+
+
+.loan-summary-item {
+    min-width: 100px;
+
+    padding: 12px 16px;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.loan-summary-item span {
+    color: var(--muted);
+
+    font-size: 9px;
+}
+
+
+.loan-summary-item strong {
+    color: var(--navy);
+
+    font-size: 18px;
+}
+
+
+.loan-summary-item.overdue-summary strong {
+    color: #d76565;
+}
+
+
+/* ============================================================
+   LOANS LIST
+============================================================ */
+
+.loans-list {
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+/* ============================================================
+   LOAN ITEM
+============================================================ */
+
+.loan-item {
+    width: 100%;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+
+    padding: 20px 22px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+
+    box-shadow:
+        0 4px 15px rgba(25, 55, 90, 0.04);
+
+    transition:
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.loan-item:hover {
+    box-shadow:
+        0 7px 22px rgba(25, 55, 90, 0.08);
+
+    transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   LOAN STATUS
+============================================================ */
+
+.loan-status-indicator {
+    width: 5px;
+
+    align-self: stretch;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background: var(--blue);
+}
+
+
+.loan-status-indicator.overdue {
+    background: #d76565;
+}
+
+
+/* ============================================================
+   BORROWER
+============================================================ */
+
+.loan-borrower {
+    min-width: 190px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+}
+
+
+.loan-avatar {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #e5efff;
+
+    color: var(--blue);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.loan-borrower-info {
+    min-width: 0;
+}
+
+
+.loan-borrower-info strong {
+    display: block;
+
+    color: var(--navy);
+
+    font-size: 13px;
+
+    margin-bottom: 4px;
+}
+
+
+.loan-borrower-info span {
+    color: var(--muted);
+
+    font-size: 9px;
+}
+
+
+/* ============================================================
+   LOAN AMOUNT
+============================================================ */
+
+.loan-amount {
+    min-width: 125px;
+}
+
+
+.loan-info-label {
+    display: block;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    margin-bottom: 5px;
+}
+
+
+.loan-amount strong {
+    color: var(--navy);
+
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   NEXT PAYMENT
+============================================================ */
+
+.loan-next-payment {
+    min-width: 145px;
+}
+
+
+.loan-next-payment strong {
+    display: block;
+
+    color: var(--navy);
+
+    font-size: 12px;
+
+    margin-bottom: 4px;
+}
+
+
+.loan-next-payment span {
+    font-size: 9px;
+
+    color: var(--muted);
+}
+
+
+.loan-next-payment.overdue strong {
+    color: #d76565;
+}
+
+
+.loan-next-payment.overdue span {
+    color: #d76565;
+
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   LOAN ACTIONS
+============================================================ */
+
+.loan-actions {
+    margin-left: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+
+.loan-action-button {
+    border: 1px solid #e5ebf2;
+
+    background: white;
+
+    border-radius: 7px;
+
+    padding: 8px 11px;
+
+    color: var(--navy);
+
+    font-size: 9px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.loan-action-button:hover {
+    background: #f6f9fd;
+
+    border-color: #d5dfeb;
+}
+
+
+.loan-action-button.payment {
+    background: #e2faf4;
+
+    border-color: #d0f3ea;
+
+    color: #0fae8f;
+}
+
+
+.loan-action-button.payment:hover {
+    background: #d4f7ee;
+}
+
+
+.loan-action-button.clear {
+    background: #e5efff;
+
+    border-color: #d8e6fa;
+
+    color: var(--blue);
+}
+
+
+.loan-action-button.clear:hover {
+    background: #dce9fb;
+}
+
+
+.loan-action-button.edit {
+    color: #60758c;
+}
+
+
+/* ============================================================
+   OVERDUE BADGE
+============================================================ */
+
+.overdue-badge {
+    display: inline-block;
+
+    margin-top: 5px;
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    background: #fff1f1;
+
+    color: #d76565;
+
+    font-size: 8px;
+
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.loans-empty {
+    display: none;
+
+    width: 100%;
+
+    padding: 90px 20px;
+
+    text-align: center;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+}
+
+
+.loans-empty-icon {
+    width: 50px;
+    height: 50px;
+
+    margin: 0 auto 15px;
+
+    border-radius: 50%;
+
+    background: #e2faf4;
+
+    color: #0fae8f;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: 700;
+}
+
+
+.loans-empty h3 {
+    margin: 0 0 7px;
+
+    color: var(--navy);
+
+    font-size: 15px;
+}
+
+
+.loans-empty p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+
+@media (max-width: 1100px) {
+
+    .loan-item {
+        flex-wrap: wrap;
+    }
+
+
+    .loan-actions {
+        width: 100%;
+
+        margin-left: 0;
+
+        justify-content: flex-end;
+
+        padding-top: 8px;
+
+        border-top: 1px solid #edf1f5;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .loans-content {
+        padding: 25px 20px;
+    }
+
+
+    .loans-page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .loan-summary {
+        width: 100%;
+    }
+
+
+    .loan-summary-item {
+        flex: 1;
+    }
+
+
+    .loan-item {
+        padding: 18px;
+
+        gap: 15px;
+    }
+
+
+    .loan-borrower,
+    .loan-amount,
+    .loan-next-payment {
+        min-width: 100%;
+
+        width: 100%;
+    }
+
+
+    .loan-actions {
+        flex-wrap: wrap;
+
+        justify-content: flex-start;
+    }
+
+}
