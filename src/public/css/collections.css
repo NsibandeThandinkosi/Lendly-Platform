@@ -1,0 +1,500 @@
+/* ============================================================
+   LENDLY - COLLECTIONS PAGE
+============================================================ */
+
+
+/* ============================================================
+   MAIN CONTENT
+============================================================ */
+
+.collections-content {
+
+    padding: 35px 40px 50px;
+
+}
+
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+
+.collections-page-header {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    margin-bottom: 28px;
+
+}
+
+
+.collections-page-header h2 {
+
+    margin-bottom: 7px;
+
+    color: var(--navy);
+
+    font-size: 21px;
+
+}
+
+
+.collections-page-header p {
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+}
+
+
+/* ============================================================
+   SUMMARY
+============================================================ */
+
+.collection-summary {
+
+    display: flex;
+
+    gap: 10px;
+
+}
+
+
+.collection-summary-item {
+
+    min-width: 125px;
+
+    padding: 12px 16px;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+}
+
+
+.collection-summary-item span {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+.collection-summary-item strong {
+
+    color: var(--navy);
+
+    font-size: 15px;
+
+}
+
+
+/* ============================================================
+   COLLECTION LIST
+============================================================ */
+
+.collections-list {
+
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+
+/* ============================================================
+   COLLECTION ITEM
+============================================================ */
+
+.collection-item {
+
+    width: 100%;
+
+    padding: 20px 22px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 25px;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+
+}
+
+
+/* ============================================================
+   BORROWER
+============================================================ */
+
+.collection-borrower {
+
+    min-width: 220px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+}
+
+
+.collection-borrower-avatar {
+
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e5efff;
+
+    color: var(--blue);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+}
+
+
+.collection-borrower-info strong {
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--navy);
+
+    font-size: 11px;
+
+}
+
+
+.collection-borrower-info span {
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+/* ============================================================
+   COLLECTION INFORMATION
+============================================================ */
+
+.collection-info {
+
+    min-width: 150px;
+
+}
+
+
+.collection-info-label {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+.collection-info-value {
+
+    color: var(--navy);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+}
+
+
+/* ============================================================
+   FULFILLED DATE
+============================================================ */
+
+.collection-date {
+
+    min-width: 150px;
+
+}
+
+
+.collection-date span {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+.collection-date strong {
+
+    color: var(--navy);
+
+    font-size: 11px;
+
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.collection-actions {
+
+    margin-left: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+}
+
+
+/* ============================================================
+   BUTTON BASE
+============================================================ */
+
+.collection-action-button {
+
+    padding: 8px 13px;
+
+    border-radius: 7px;
+
+    font-size: 9px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+
+}
+
+
+/* ============================================================
+   VIEW BUTTON
+============================================================ */
+
+.collection-view-button {
+
+    border: 1px solid #dce6f2;
+
+    background: white;
+
+    color: var(--blue);
+
+}
+
+
+.collection-view-button:hover {
+
+    background: #f1f6ff;
+
+}
+
+
+/* ============================================================
+   DELETE BUTTON
+============================================================ */
+
+.collection-delete-button {
+
+    border: 1px solid #f0dada;
+
+    background: white;
+
+    color: #d76565;
+
+}
+
+
+.collection-delete-button:hover {
+
+    background: #fff1f1;
+
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.collections-empty {
+
+    width: 100%;
+
+    padding: 55px 20px;
+
+    text-align: center;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+
+}
+
+
+.collections-empty h3 {
+
+    margin-bottom: 7px;
+
+    color: var(--navy);
+
+    font-size: 15px;
+
+}
+
+
+.collections-empty p {
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1100px) {
+
+    .collection-item {
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .collection-actions {
+
+        width: 100%;
+
+        margin-left: 0;
+
+        justify-content: flex-end;
+
+    }
+
+}
+
+
+@media (max-width: 750px) {
+
+    .collections-content {
+
+        padding: 25px 20px;
+
+    }
+
+
+    .collections-page-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .collection-summary {
+
+        width: 100%;
+
+    }
+
+
+    .collection-summary-item {
+
+        flex: 1;
+
+    }
+
+
+    .collection-borrower,
+    .collection-info,
+    .collection-date {
+
+        min-width: 0;
+
+        width: 100%;
+
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .collection-summary {
+
+        flex-direction: column;
+
+    }
+
+
+    .collection-actions {
+
+        justify-content: stretch;
+
+    }
+
+
+    .collection-action-button {
+
+        flex: 1;
+
+    }
+
+}

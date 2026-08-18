@@ -10,21 +10,29 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Loans - Lendly</title>
+    <title>Collections - Lendly</title>
+
+
+    <!-- SHARED STYLES -->
 
     <link
         rel="stylesheet"
         href="../css/innerStyle.css"
     >
+
+
+    <!-- COLLECTIONS PAGE STYLES -->
+
     <link
         rel="stylesheet"
-        href="../css/loans.css"
+        href="../css/collections.css"
     >
 
 </head>
 
 
 <body>
+
 
     <div class="dashboard-page">
 
@@ -35,7 +43,11 @@
 
         <aside class="sidebar">
 
-            <a href="dashboard.html" class="logo">
+
+            <a
+                href="dashboard.html"
+                class="logo"
+            >
 
                 <span class="logo-icon">
                     L
@@ -69,7 +81,7 @@
 
                 <a
                     href="loans.html"
-                    class="nav-item active"
+                    class="nav-item"
                 >
 
                     <span class="nav-icon">
@@ -85,7 +97,7 @@
 
                 <a
                     href="collections.html"
-                    class="nav-item"
+                    class="nav-item active"
                 >
 
                     <span class="nav-icon">
@@ -115,6 +127,7 @@
 
             </nav>
 
+
         </aside>
 
 
@@ -126,38 +139,45 @@
         <main class="main-content">
 
 
-            <!-- TOPBAR -->
+            <!-- ==================================================
+                 TOPBAR
+            =================================================== -->
 
             <header class="topbar">
+
 
                 <div>
 
                     <p class="page-label">
-                        Lending
+                        Lendly
                     </p>
 
                     <h1>
-                        Loans
+                        Collections
                     </h1>
 
                 </div>
 
 
-                <!-- PROFILE BUTTON -->
+                <!-- TOPBAR RIGHT -->
 
                 <div class="topbar-right">
 
 
+
+                    <!--Notifications-->
                     <button
                         class="notification-button"
                         id="notificationButton"
                     >
                         ♧
                     </button>
+                    
+                    <!-- Profile -->
 
                     <button
                         class="user-profile"
-                        id="profileButton"
+                        onclick="window.location.href='profile.html'"
                     >
 
                         <div class="user-avatar">
@@ -167,133 +187,114 @@
                         <div>
 
                             <strong>
-                                Admin
+                                Themba Ngema
                             </strong>
 
                             <span>
-                                Loan Manager
+                                Account
                             </span>
 
                         </div>
 
                     </button>
 
+
                 </div>
+
 
             </header>
 
 
 
             <!-- ==================================================
-                 LOANS CONTENT
+                 COLLECTIONS CONTENT
             =================================================== -->
 
-            <section class="loans-content">
+            <section class="collections-content">
 
 
                 <!-- PAGE HEADER -->
 
-                <div class="loans-page-header">
+                <div class="collections-page-header">
+
 
                     <div>
 
-                        <p class="panel-label">
-                            Active lending
-                        </p>
-
                         <h2>
-                            Active Loans
+                            Collected Loans
                         </h2>
 
-                        <p class="loans-description">
-                            Manage active and overdue loans,
-                            record payments and update loan details.
+                        <p>
+                            View and manage loans that have been fully fulfilled.
                         </p>
 
                     </div>
 
 
-                    <div class="loan-summary">
+                    <!-- SUMMARY -->
 
-                        <div class="loan-summary-item">
+                    <div class="collection-summary">
+
+
+                        <div class="collection-summary-item">
 
                             <span>
-                                Active
+                                Total collected
                             </span>
 
-                            <strong id="activeLoanCount">
+                            <strong id="totalCollected">
+                                R0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="collection-summary-item">
+
+                            <span>
+                                Fulfilled loans
+                            </span>
+
+                            <strong id="totalLoans">
                                 0
                             </strong>
 
                         </div>
 
 
-                        <div class="loan-summary-item overdue-summary">
-
-                            <span>
-                                Overdue
-                            </span>
-
-                            <strong id="overdueLoanCount">
-                                0
-                            </strong>
-
-                        </div>
-
                     </div>
+
 
                 </div>
 
 
 
-                <!-- ==================================================
-                     LOAN LIST
-                =================================================== -->
+                <!-- COLLECTION LIST -->
 
                 <div
-                    class="loans-list"
-                    id="loansList"
+                    class="collections-list"
+                    id="collectionsList"
                 >
 
-                    <!-- JavaScript will insert loans here -->
-
-                </div>
-
-
-
-                <!-- EMPTY STATE -->
-
-                <div
-                    class="loans-empty"
-                    id="loansEmpty"
-                >
-
-                    <div class="loans-empty-icon">
-                        ✓
-                    </div>
-
-                    <h3>
-                        No active loans
-                    </h3>
-
-                    <p>
-                        All loans have been collected.
-                    </p>
+                    <!-- JavaScript will insert
+                         collection records here -->
 
                 </div>
 
 
             </section>
 
+
         </main>
+
 
     </div>
 
 
 
-    <script src="../js/profile.js"></script>
+    <!-- JAVASCRIPT -->
 
-    <script src="../js/loans.js"></script>
+    <script src="../js/collections.js"></script>
 
 
 </body>
