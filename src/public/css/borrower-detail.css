@@ -1,0 +1,420 @@
+/* ============================================================
+   LENDLY - BORROWER DETAILS
+============================================================ */
+
+
+/* ============================================================
+   CONTENT
+============================================================ */
+
+.borrower-detail-content {
+
+    padding: 35px 40px 55px;
+
+}
+
+
+.back-link {
+
+    display: inline-block;
+
+    margin-bottom: 20px;
+
+    color: var(--muted);
+
+    text-decoration: none;
+
+    font-size: 10px;
+
+}
+
+
+.back-link:hover {
+
+    color: var(--blue);
+
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.borrower-detail-header {
+
+    padding: 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.borrower-detail-person {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+}
+
+
+.borrower-detail-avatar {
+
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e5efff;
+
+    color: var(--blue);
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+}
+
+
+.borrower-detail-person p {
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    margin-bottom: 3px;
+
+}
+
+
+.borrower-detail-person h2 {
+
+    color: var(--navy);
+
+    font-size: 19px;
+
+    margin-bottom: 3px;
+
+}
+
+
+.borrower-detail-person span {
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+/* ============================================================
+   CREATE LOAN BUTTON
+============================================================ */
+
+.create-loan-btn {
+
+    padding: 10px 15px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: linear-gradient(
+        135deg,
+        var(--blue),
+        #4086ff
+    );
+
+    color: white;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+}
+
+
+/* ============================================================
+   SECTION
+============================================================ */
+
+.borrower-section {
+
+    padding: 25px;
+
+    margin-bottom: 15px;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+}
+
+
+.section-title {
+
+    padding-bottom: 15px;
+
+    margin-bottom: 15px;
+
+    border-bottom: 1px solid var(--border);
+
+}
+
+
+.section-title h3 {
+
+    color: var(--navy);
+
+    font-size: 13px;
+
+    margin-bottom: 4px;
+
+}
+
+
+.section-title p {
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+/* ============================================================
+   PERSONAL DETAILS
+============================================================ */
+
+.borrower-info-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 12px;
+
+}
+
+
+.borrower-info-grid > div {
+
+    padding: 14px;
+
+    border-radius: 8px;
+
+    background: #f8fafc;
+
+}
+
+
+.borrower-info-grid span {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 8px;
+
+}
+
+
+.borrower-info-grid strong {
+
+    color: var(--navy);
+
+    font-size: 10px;
+
+}
+
+
+/* ============================================================
+   LOANS
+============================================================ */
+
+.borrower-loans {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+
+}
+
+
+.borrower-loan-row {
+
+    padding: 15px;
+
+    display: grid;
+
+    grid-template-columns:
+        1.2fr 1fr 1fr 1fr;
+
+    align-items: center;
+
+    gap: 15px;
+
+    border: 1px solid #edf1f5;
+
+    border-radius: 9px;
+
+}
+
+
+.borrower-loan-row span {
+
+    display: block;
+
+    color: var(--muted);
+
+    font-size: 8px;
+
+    margin-bottom: 4px;
+
+}
+
+
+.borrower-loan-row strong {
+
+    color: var(--navy);
+
+    font-size: 10px;
+
+}
+
+
+.loan-status {
+
+    display: inline-block;
+
+    width: max-content;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+}
+
+
+.loan-status.active {
+
+    background: #e5efff;
+
+    color: var(--blue);
+
+}
+
+
+.loan-status.overdue {
+
+    background: #fff0f0;
+
+    color: #d76565;
+
+}
+
+
+.loan-status.settled {
+
+    background: #e2faf4;
+
+    color: #0fae8f;
+
+}
+
+
+.no-loans {
+
+    padding: 40px;
+
+    text-align: center;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 750px) {
+
+    .borrower-detail-content {
+
+        padding: 25px 20px 40px;
+
+    }
+
+
+    .borrower-detail-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .borrower-info-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .borrower-loan-row {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .borrower-section {
+
+        padding: 20px;
+
+    }
+
+}

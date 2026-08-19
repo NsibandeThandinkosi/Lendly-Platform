@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Loan - Lendly</title>
+
+
+    <link
+        rel="stylesheet"
+        href="../css/innerStyle.css"
+    >
+
+
+    <link
+        rel="stylesheet"
+        href="../css/create-loan.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <div class="dashboard-page">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+
+            <a
+                href="dashboard.html"
+                class="logo"
+            >
+
+                <span class="logo-icon">
+                    L
+                </span>
+
+                Lendly
+
+            </a>
+
+
+            <nav class="sidebar-nav">
+
+
+                <a
+                    href="dashboard.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">▦</span>
+                    Dashboard
+                </a>
+
+
+                <a
+                    href="loans.html"
+                    class="nav-item active"
+                >
+                    <span class="nav-icon">↗</span>
+                    Loans
+                </a>
+
+
+                <a
+                    href="collections.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">✓</span>
+                    Collections
+                </a>
+
+
+                <a
+                    href="borrowers.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">♙</span>
+                    Borrowers
+                </a>
+
+
+            </nav>
+
+
+        </aside>
+
+
+
+        <!-- MAIN -->
+
+        <main class="main-content">
+
+
+            <!-- TOPBAR -->
+
+            <header class="topbar">
+
+
+                <div>
+
+                    <p class="page-label">
+                        Loans
+                    </p>
+
+                    <h1>
+                        Create New Loan
+                    </h1>
+
+                </div>
+
+
+                <div class="topbar-right">
+
+
+                    <button
+                        class="user-profile"
+                        onclick="window.location.href='profile.html'"
+                    >
+
+                        <div class="user-avatar">
+                            TN
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Themba
+                            </strong>
+
+                            <span>
+                                Account
+                            </span>
+
+                        </div>
+
+                    </button>
+
+
+                </div>
+
+
+            </header>
+
+
+
+            <!-- CONTENT -->
+
+            <section class="create-loan-content">
+
+
+                <a
+                    href="borrowers.html"
+                    class="back-link"
+                    id="backLink"
+                >
+                    ← Back to Borrowers
+                </a>
+
+
+
+                <div class="loan-calculator-layout">
+
+
+                    <!-- ==================================================
+                         INTRO
+                    =================================================== -->
+
+                    <div class="loan-calculator-intro">
+
+
+                        <span>
+                            CREATE A LOAN
+                        </span>
+
+
+                        <h2>
+
+                            Build the loan
+                            <strong>
+                                before you create it.
+                            </strong>
+
+                        </h2>
+
+
+                        <p>
+
+                            Enter the loan terms and calculate
+                            the expected repayment before saving
+                            the loan.
+
+                        </p>
+
+
+                        <div class="loan-rules">
+
+
+                            <div>
+
+                                <strong>
+                                    First loan of the year
+                                </strong>
+
+                                <span>
+                                    Maximum interest: 5% per month
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Repeat loan
+                                </strong>
+
+                                <span>
+                                    Maximum interest: 3% per month
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Service fee
+                                </strong>
+
+                                <span>
+                                    Maximum: R60 per month
+                                </span>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- ==================================================
+                         CALCULATOR CARD
+                    =================================================== -->
+
+                    <div class="create-loan-card">
+
+
+                        <!-- BORROWER -->
+
+                        <div class="form-section">
+
+
+                            <h3>
+                                Borrower
+                            </h3>
+
+
+                            <!-- ============================================================
+                                BORROWER
+                            ============================================================ -->
+
+                            <div class="form-section">
+
+                                <h3>Borrower</h3>
+
+                                <div class="borrower-display">
+
+                                    <div class="borrower-avatar">
+                                        <span id="borrowerInitials">--</span>
+                                    </div>
+
+                                    <div class="borrower-info">
+
+                                        <strong id="borrowerName">
+                                            Loading borrower...
+                                        </strong>
+
+                                        <span id="borrowerPhone">
+                                            Borrower details
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- LOAN TERMS -->
+
+                        <div class="form-section">
+
+
+                            <h3>
+                                Loan Terms
+                            </h3>
+
+
+                            <div class="loan-input-grid">
+
+
+                                <div class="input-group">
+
+                                    <label for="loanAmount">
+                                        Loan amount
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <span>
+                                            R
+                                        </span>
+
+                                        <input
+                                            type="number"
+                                            id="loanAmount"
+                                            min="100"
+                                            step="100"
+                                            placeholder="8000"
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <div class="input-group">
+
+                                    <label for="loanDuration">
+                                        Duration
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <input
+                                            type="number"
+                                            id="loanDuration"
+                                            min="1"
+                                            max="5"
+                                            placeholder="3"
+                                        >
+
+                                        <span>
+                                            months
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <div class="input-group">
+
+                                    <label for="interestRate">
+                                        Interest rate
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <input
+                                            type="number"
+                                            id="interestRate"
+                                            min="0"
+                                            step="0.1"
+                                        >
+
+                                        <span>
+                                            %
+                                        </span>
+
+                                    </div>
+
+                                    <small id="interestLimit">
+                                        Select a borrower first.
+                                    </small>
+
+                                </div>
+
+
+
+                                <div class="input-group">
+
+                                    <label for="serviceFee">
+                                        Monthly service fee
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <span>
+                                            R
+                                        </span>
+
+                                        <input
+                                            type="number"
+                                            id="serviceFee"
+                                            min="0"
+                                            max="60"
+                                            value="60"
+                                        >
+
+                                    </div>
+
+                                    <small>
+                                        Maximum R60 per month.
+                                    </small>
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- CALCULATE -->
+
+                        <button
+                            type="button"
+                            id="calculateBtn"
+                            class="calculate-btn"
+                        >
+
+                            Calculate Repayment
+
+                        </button>
+
+
+
+                        <!-- RESULTS -->
+
+                        <div
+                            class="calculator-result"
+                            id="calculatorResult"
+                        >
+
+
+                            <div class="payment-results">
+
+
+                                <div>
+
+                                    <p>
+                                        Total repayment
+                                    </p>
+
+                                    <h3 id="totalRepayment">
+                                        R0.00
+                                    </h3>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p>
+                                        Monthly payment
+                                    </p>
+
+                                    <h3 id="monthlyPayment">
+                                        R0.00
+                                    </h3>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <div class="result-details">
+
+
+                                <div>
+
+                                    <span>
+                                        Amount borrowed
+                                    </span>
+
+                                    <strong id="displayAmount">
+                                        R0.00
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Total interest
+                                    </span>
+
+                                    <strong id="displayInterest">
+                                        R0.00
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Initiation fee
+                                    </span>
+
+                                    <strong id="displayInitiationFee">
+                                        R0.00
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Service fees
+                                    </span>
+
+                                    <strong id="displayServiceFees">
+                                        R0.00
+                                    </strong>
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- CREATE -->
+
+                        <button
+                            type="button"
+                            id="createLoanBtn"
+                            class="create-loan-submit"
+                            disabled
+                        >
+
+                            Create Loan
+
+                        </button>
+
+
+                        <p
+                            class="create-loan-note"
+                            id="createLoanNote"
+                        >
+                            Calculate the loan before creating it.
+
+                        </p>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+        </main>
+
+
+    </div>
+
+
+
+    <script src="../js/create-loan.js"></script>
+
+</body>
+
+</html>
