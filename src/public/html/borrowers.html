@@ -10,21 +10,26 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Loans - Lendly</title>
+    <title>Borrowers - Lendly</title>
+
+    <!-- SHARED STYLES -->
+    <link 
+        rel="stylesheet" 
+        href="../css/innerStyle.css"
+    >
+
+    <!-- PAGE STYLES -->
 
     <link
         rel="stylesheet"
-        href="../css/innerStyle.css"
-    >
-    <link
-        rel="stylesheet"
-        href="../css/loans.css"
+        href="../css/borrowers.css"
     >
 
 </head>
 
 
 <body>
+
 
     <div class="dashboard-page">
 
@@ -35,7 +40,11 @@
 
         <aside class="sidebar">
 
-            <a href="dashboard.html" class="logo">
+
+            <a
+                href="dashboard.html"
+                class="logo"
+            >
 
                 <span class="logo-icon">
                     L
@@ -48,8 +57,6 @@
 
             <nav class="sidebar-nav">
 
-
-                <!-- Dashboard -->
 
                 <a
                     href="dashboard.html"
@@ -65,11 +72,9 @@
                 </a>
 
 
-                <!-- Loans -->
-
                 <a
                     href="loans.html"
-                    class="nav-item active"
+                    class="nav-item"
                 >
 
                     <span class="nav-icon">
@@ -80,8 +85,6 @@
 
                 </a>
 
-
-                <!-- Collections -->
 
                 <a
                     href="collections.html"
@@ -97,11 +100,9 @@
                 </a>
 
 
-                <!-- Borrowers -->
-
                 <a
                     href="borrowers.html"
-                    class="nav-item"
+                    class="nav-item active"
                 >
 
                     <span class="nav-icon">
@@ -114,6 +115,7 @@
 
 
             </nav>
+
 
         </aside>
 
@@ -130,34 +132,26 @@
 
             <header class="topbar">
 
+
                 <div>
 
                     <p class="page-label">
-                        Lending
+                        Borrowers
                     </p>
 
                     <h1>
-                        Loans
+                        Borrowers
                     </h1>
 
                 </div>
 
 
-                <!-- PROFILE BUTTON -->
-
                 <div class="topbar-right">
 
 
                     <button
-                        class="notification-button"
-                        id="notificationButton"
-                    >
-                        ♧
-                    </button>
-
-                    <button
                         class="user-profile"
-                        id="profileButton"
+                        onclick="window.location.href='profile.html'"
                     >
 
                         <div class="user-avatar">
@@ -167,134 +161,117 @@
                         <div>
 
                             <strong>
-                                Admin
+                                Thandinkosi
                             </strong>
 
                             <span>
-                                Loan Manager
+                                Account
                             </span>
 
                         </div>
 
                     </button>
 
+
                 </div>
+
 
             </header>
 
 
 
             <!-- ==================================================
-                 LOANS CONTENT
+                 BORROWERS CONTENT
             =================================================== -->
 
-            <section class="loans-content">
+            <section class="borrowers-content">
 
 
                 <!-- PAGE HEADER -->
 
-                <div class="loans-page-header">
+                <div class="borrowers-page-header">
+
 
                     <div>
 
-                        <p class="panel-label">
-                            Active lending
-                        </p>
-
                         <h2>
-                            Active Loans
+                            All Borrowers
                         </h2>
 
-                        <p class="loans-description">
-                            Manage active and overdue loans,
-                            record payments and update loan details.
+                        <p>
+                            Manage your saved borrowers and their loans.
                         </p>
 
                     </div>
 
 
-                    <div class="loan-summary">
+                    <button
+                        class="create-borrower-btn"
+                        id="createBorrowerBtn"
+                    >
+                        + New Borrower
+                    </button>
 
-                        <div class="loan-summary-item">
-
-                            <span>
-                                Active
-                            </span>
-
-                            <strong id="activeLoanCount">
-                                0
-                            </strong>
-
-                        </div>
-
-
-                        <div class="loan-summary-item overdue-summary">
-
-                            <span>
-                                Overdue
-                            </span>
-
-                            <strong id="overdueLoanCount">
-                                0
-                            </strong>
-
-                        </div>
-
-                    </div>
 
                 </div>
 
 
 
-                <!-- ==================================================
-                     LOAN LIST
-                =================================================== -->
+                <!-- SEARCH -->
 
-                <div
-                    class="loans-list"
-                    id="loansList"
-                >
+                <div class="borrowers-toolbar">
 
-                    <!-- JavaScript will insert loans here -->
+
+                    <div class="borrower-search">
+
+                        <span>
+                            ⌕
+                        </span>
+
+                        <input
+                            type="text"
+                            id="borrowerSearch"
+                            placeholder="Search borrowers..."
+                        >
+
+                    </div>
+
+
+                    <span
+                        class="borrower-count"
+                        id="borrowerCount"
+                    >
+                        0 borrowers
+                    </span>
+
 
                 </div>
 
 
 
-                <!-- EMPTY STATE -->
+                <!-- BORROWER LIST -->
 
                 <div
-                    class="loans-empty"
-                    id="loansEmpty"
+                    class="borrowers-list"
+                    id="borrowersList"
                 >
 
-                    <div class="loans-empty-icon">
-                        ✓
-                    </div>
-
-                    <h3>
-                        No active loans
-                    </h3>
-
-                    <p>
-                        All loans have been collected.
-                    </p>
+                    <!-- JavaScript inserts borrowers here -->
 
                 </div>
 
 
             </section>
 
+
         </main>
+
 
     </div>
 
 
 
-    <script src="../js/profile.js"></script>
-
-    <script src="../js/loans.js"></script>
-
+    <script src="../js/borrowers.js"></script>
 
 </body>
 

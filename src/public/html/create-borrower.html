@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Borrower - Lendly</title>
+
+    <!-- CORE INNER PAGE STYLES -->
+    <link
+        rel="stylesheet"
+        href="../css/innerStyle.css"
+    >
+
+    <!-- CREATE BORROWER PAGE STYLES -->
+    <link
+        rel="stylesheet"
+        href="../css/create-borrower.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="dashboard-page">
+
+
+        <!-- ====================================================
+             SIDEBAR
+        ==================================================== -->
+
+        <aside class="sidebar">
+
+            <a href="dashboard.html" class="logo">
+
+                <span class="logo-icon">
+                    L
+                </span>
+
+                Lendly
+
+            </a>
+
+
+            <nav class="sidebar-nav">
+
+                <a
+                    href="dashboard.html"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ▦
+                    </span>
+
+                    Dashboard
+
+                </a>
+
+
+                <a
+                    href="loans.html"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ↗
+                    </span>
+
+                    Loans
+
+                </a>
+
+
+                <a
+                    href="collections.html"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ✓
+                    </span>
+
+                    Collections
+
+                </a>
+
+
+                <a
+                    href="borrowers.html"
+                    class="nav-item active"
+                >
+
+                    <span class="nav-icon">
+                        ♙
+                    </span>
+
+                    Borrowers
+
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+
+        <!-- ====================================================
+             MAIN CONTENT
+        ==================================================== -->
+
+        <main class="main-content">
+
+
+            <!-- TOPBAR -->
+
+            <header class="topbar">
+
+                <div class="topbar-left">
+
+                    <h2>
+                        Create Borrower
+                    </h2>
+
+                </div>
+
+
+                <button
+                    class="user-profile"
+                    onclick="window.location.href='profile.html'"
+                    >
+
+                    <div class="user-avatar">
+                       TN
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Admin
+                        </strong>
+
+                        <span>
+                            Loan Manager
+                        </span>
+
+                    </div>
+
+                </button>
+
+            </header>
+
+
+
+            <!-- =================================================
+                 CREATE BORROWER CONTENT
+            ================================================= -->
+
+            <section class="create-borrower-content">
+
+
+                <a
+                    href="borrowers.html"
+                    class="back-link"
+                >
+                    ← Back to Borrowers
+                </a>
+
+
+                <div class="create-borrower-layout">
+
+
+                    <!-- INTRO -->
+
+                    <div class="create-borrower-intro">
+
+                        <span>
+                            NEW BORROWER
+                        </span>
+
+                        <h1>
+                            Add a new
+                            <strong>borrower.</strong>
+                        </h1>
+
+                        <p>
+                            Add the borrower's basic personal
+                            details before creating their loan.
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- FORM CARD -->
+
+                    <div class="create-borrower-card">
+
+
+                        <div class="form-section">
+
+                            <h3>
+                                Borrower Details
+                            </h3>
+
+
+                            <!-- FIRST NAME -->
+
+                            <div class="input-group">
+
+                                <label for="firstName">
+                                    First name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    placeholder="Enter first name"
+                                >
+
+                            </div>
+
+
+
+                            <!-- LAST NAME -->
+
+                            <div class="input-group">
+
+                                <label for="lastName">
+                                    Last name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    placeholder="Enter last name"
+                                >
+
+                            </div>
+
+
+
+                            <!-- PHONE -->
+
+                            <div class="input-group">
+
+                                <label for="phone">
+                                    Phone number
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    placeholder="Enter phone number"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- CREATE BORROWER -->
+
+                        <button
+                            type="button"
+                            id="createBorrowerBtn"
+                            class="create-borrower-btn"
+                        >
+                            Create Borrower
+                        </button>
+
+
+
+                        <!-- CREATE LOAN -->
+
+                        <button
+                            type="button"
+                            id="createLoanBtn"
+                            class="create-loan-btn"
+                            disabled
+                        >
+                            Create Loan for Borrower
+                        </button>
+
+
+                        <p
+                            id="borrowerNote"
+                            class="borrower-note"
+                        >
+                            Create the borrower first before
+                            creating a loan.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="../js/create-borrower.js"></script>
+
+</body>
+
+</html>

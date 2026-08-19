@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Borrower Details - Lendly</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/innerStyle.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/borrower-detail.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <div class="dashboard-page">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+
+            <a
+                href="dashboard.html"
+                class="logo"
+            >
+
+                <span class="logo-icon">
+                    L
+                </span>
+
+                Lendly
+
+            </a>
+
+
+            <nav class="sidebar-nav">
+
+
+                <a
+                    href="dashboard.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">▦</span>
+                    Dashboard
+                </a>
+
+
+                <a
+                    href="loans.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">↗</span>
+                    Loans
+                </a>
+
+
+                <a
+                    href="collections.html"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">✓</span>
+                    Collections
+                </a>
+
+
+                <a
+                    href="borrowers.html"
+                    class="nav-item active"
+                >
+                    <span class="nav-icon">♙</span>
+                    Borrowers
+                </a>
+
+
+            </nav>
+
+
+        </aside>
+
+
+
+        <!-- MAIN -->
+
+        <main class="main-content">
+
+
+            <!-- TOPBAR -->
+
+            <header class="topbar">
+
+
+                <div>
+
+                    <p class="page-label">
+                        Borrowers
+                    </p>
+
+                    <h1>
+                        Borrower Details
+                    </h1>
+
+                </div>
+
+
+                <div class="topbar-right">
+
+
+                    <button
+                        class="user-profile"
+                        onclick="window.location.href='profile.html'"
+                    >
+
+                        <div class="user-avatar">
+                            TN
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Thandinkosi
+                            </strong>
+
+                            <span>
+                                Account
+                            </span>
+
+                        </div>
+
+                    </button>
+
+
+                </div>
+
+
+            </header>
+
+
+
+            <!-- CONTENT -->
+
+            <section class="borrower-detail-content">
+
+
+                <a
+                    href="borrowers.html"
+                    class="back-link"
+                >
+                    ← Back to Borrowers
+                </a>
+
+
+
+                <!-- BORROWER HEADER -->
+
+                <div class="borrower-detail-header">
+
+
+                    <div class="borrower-detail-person">
+
+
+                        <div
+                            class="borrower-detail-avatar"
+                            id="borrowerAvatar"
+                        >
+                            --
+                        </div>
+
+
+                        <div>
+
+                            <p>
+                                Borrower
+                            </p>
+
+                            <h2 id="borrowerName">
+                                Loading...
+                            </h2>
+
+                            <span id="borrowerPhone">
+                                --
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <button
+                        class="create-loan-btn"
+                        id="createLoanBtn"
+                    >
+                        + Create New Loan
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- PERSONAL DETAILS -->
+
+                <div class="borrower-section">
+
+
+                    <div class="section-title">
+
+                        <h3>
+                            Personal Details
+                        </h3>
+
+                    </div>
+
+
+                    <div class="borrower-info-grid">
+
+
+                        <div>
+
+                            <span>
+                                First Name
+                            </span>
+
+                            <strong id="firstName">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Last Name
+                            </span>
+
+                            <strong id="lastName">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Phone Number
+                            </span>
+
+                            <strong id="phone">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- LOANS -->
+
+                <div class="borrower-section">
+
+
+                    <div class="section-title">
+
+                        <div>
+
+                            <h3>
+                                Loan History
+                            </h3>
+
+                            <p>
+                                All loans associated with this borrower.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div
+                        class="borrower-loans"
+                        id="borrowerLoans"
+                    >
+
+                        <!-- JavaScript -->
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+        </main>
+
+
+    </div>
+
+
+
+    <script src="../js/borrower-detail.js"></script>
+
+</body>
+
+</html>
