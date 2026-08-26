@@ -4,115 +4,6 @@
 
 
 /* ============================================================
-   BORROWER DATA
-============================================================ */
-
-const borrowers = [
-
-    {
-        id: 1,
-
-        firstName: "Lerato",
-        lastName: "Mokoena",
-
-        phone: "071 234 5678",
-
-        loans: [
-
-            {
-                id: 101,
-                status: "settled",
-                totalAmount: 12500,
-                originalAmount: 12000,
-                date: "2026-04-10",
-                nextDueDate: null,
-                settlementDate: "2026-08-10"
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 2,
-
-        firstName: "Sipho",
-        lastName: "Dlamini",
-
-        phone: "082 555 1234",
-
-        loans: [
-
-            {
-                id: 102,
-                status: "active",
-                totalAmount: null,
-                remainingAmount: 6500,
-                originalAmount: 8000,
-                date: "2026-08-01",
-                nextDueDate: "2026-09-01",
-                settlementDate: null
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 3,
-
-        firstName: "Thabo",
-        lastName: "Nkosi",
-
-        phone: "079 876 5432",
-
-        loans: [
-
-            {
-                id: 103,
-                status: "overdue",
-                totalAmount: null,
-                remainingAmount: 3500,
-                originalAmount: 6000,
-                date: "2026-05-28",
-                nextDueDate: "2026-08-15",
-                settlementDate: null
-            },
-
-            {
-                id: 104,
-                status: "settled",
-                totalAmount: 6500,
-                originalAmount: 6000,
-                date: "2026-01-20",
-                nextDueDate: null,
-                settlementDate: "2026-03-20"
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 4,
-
-        firstName: "Ayanda",
-        lastName: "Ndlovu",
-
-        phone: "083 111 2233",
-
-        loans: []
-
-    }
-
-];
-
-
-
-/* ============================================================
    GET BORROWER ID
 ============================================================ */
 
@@ -123,21 +14,99 @@ const params =
 
 
 const borrowerId =
-    Number(
-        params.get("id")
+    params.get("id");
+
+
+
+/* ============================================================
+   ELEMENTS
+============================================================ */
+
+const borrowerAvatar =
+    document.getElementById(
+        "borrowerAvatar"
+    );
+
+
+const borrowerName =
+    document.getElementById(
+        "borrowerName"
+    );
+
+
+const borrowerPhone =
+    document.getElementById(
+        "borrowerPhone"
+    );
+
+
+const firstName =
+    document.getElementById(
+        "firstName"
+    );
+
+
+const lastName =
+    document.getElementById(
+        "lastName"
+    );
+
+
+const phone =
+    document.getElementById(
+        "phone"
+    );
+
+
+const borrowerLoans =
+    document.getElementById(
+        "borrowerLoans"
+    );
+
+
+const createLoanBtn =
+    document.getElementById(
+        "createLoanBtn"
     );
 
 
 
 /* ============================================================
-   FIND BORROWER
+   AUTHENTICATION
 ============================================================ */
 
-const borrower =
-    borrowers.find(
-        borrower =>
-            borrower.id === borrowerId
-    );
+function getAccessToken() {
+
+    const storedSession =
+        localStorage.getItem("lendlySession");
+
+    if (!storedSession) {
+        return null;
+    }
+
+    try {
+
+        const session =
+            JSON.parse(storedSession);
+
+        if (!session || !session.access_token) {
+            return null;
+        }
+
+        return session.access_token;
+
+    } catch (error) {
+
+        console.error(
+            "Unable to read login session:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
 
 
 
@@ -148,16 +117,20 @@ const borrower =
 function getInitials(borrower) {
 
     return (
-        borrower.firstName.charAt(0) +
-        borrower.lastName.charAt(0)
+        borrower.first_name.charAt(0) +
+        borrower.last_name.charAt(0)
     ).toUpperCase();
 
 }
 
 
+
 function formatCurrency(amount) {
 
-    if (amount === null || amount === undefined) {
+    if (
+        amount === null ||
+        amount === undefined
+    ) {
 
         return "--";
 
@@ -174,6 +147,7 @@ function formatCurrency(amount) {
     ).format(amount);
 
 }
+
 
 
 function formatDate(date) {
@@ -199,62 +173,177 @@ function formatDate(date) {
 
 
 /* ============================================================
-   DISPLAY BORROWER
+   LOAD BORROWER
 ============================================================ */
 
-function displayBorrower() {
+async function loadBorrower() {
 
-    if (!borrower) {
+    if (!borrowerId) {
 
-        alert(
-            "Borrower could not be found."
+        showBorrowerError(
+            "No borrower was specified."
         );
-
-        window.location.href =
-            "borrowers.html";
 
         return;
 
     }
 
 
-    document.getElementById(
-        "borrowerAvatar"
-    ).textContent =
-        getInitials(borrower);
+    const accessToken =
+        getAccessToken();
 
 
-    document.getElementById(
-        "borrowerName"
-    ).textContent =
-        `${borrower.firstName} ${borrower.lastName}`;
+    if (!accessToken) {
+
+        window.location.href =
+            "/login";
+
+        return;
+
+    }
 
 
-    document.getElementById(
-        "borrowerPhone"
-    ).textContent =
+    try {
+
+        const response =
+            await fetch(
+                `/api/borrowers/${encodeURIComponent(borrowerId)}`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Borrower loading error:",
+                result
+            );
+
+
+            if (
+                response.status === 401
+            ) {
+
+                localStorage.removeItem(
+                    "lendlyUser"
+                );
+                localStorage.removeItem(
+                    "lendlySession"
+                );
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            throw new Error(
+                result.message ||
+                "Borrower could not be found."
+            );
+
+        }
+
+
+        displayBorrower(
+            result.borrower
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading borrower:",
+            error
+        );
+
+
+        showBorrowerError(
+            error.message
+        );
+
+    }
+
+}
+
+
+
+/* ============================================================
+   DISPLAY BORROWER
+============================================================ */
+
+function displayBorrower(borrower) {
+
+    if (!borrower) {
+
+        showBorrowerError(
+            "Borrower could not be found."
+        );
+
+        return;
+
+    }
+
+
+    borrowerAvatar.textContent =
+        getInitials(
+            borrower
+        );
+
+
+    borrowerName.textContent =
+        `${borrower.first_name} ${borrower.last_name}`;
+
+
+    borrowerPhone.textContent =
         borrower.phone;
 
 
-    document.getElementById(
-        "firstName"
-    ).textContent =
-        borrower.firstName;
+    firstName.textContent =
+        borrower.first_name;
 
 
-    document.getElementById(
-        "lastName"
-    ).textContent =
-        borrower.lastName;
+    lastName.textContent =
+        borrower.last_name;
 
 
-    document.getElementById(
-        "phone"
-    ).textContent =
+    phone.textContent =
         borrower.phone;
 
 
-    displayLoans();
+    /*
+        The borrowers table currently doesn't
+        contain loan information.
+
+        We will connect loans here once the
+        loans table/API is implemented.
+    */
+
+    displayLoans([]);
+
+
+    createLoanBtn.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                `/create-loan.html?borrowerId=${borrower.id}`;
+
+        }
+    );
 
 }
 
@@ -264,20 +353,17 @@ function displayBorrower() {
    DISPLAY LOANS
 ============================================================ */
 
-function displayLoans() {
+function displayLoans(loans) {
 
-    const container =
-        document.getElementById(
-            "borrowerLoans"
-        );
+    borrowerLoans.innerHTML = "";
 
 
-    container.innerHTML = "";
+    if (
+        !loans ||
+        loans.length === 0
+    ) {
 
-
-    if (borrower.loans.length === 0) {
-
-        container.innerHTML = `
+        borrowerLoans.innerHTML = `
 
             <div class="no-loans">
 
@@ -292,18 +378,8 @@ function displayLoans() {
     }
 
 
-    /*
-        Sort by due date.
-
-        For active/overdue loans we use
-        nextDueDate.
-
-        For settled loans we use
-        settlementDate.
-    */
-
     const sortedLoans =
-        [...borrower.loans].sort(
+        [...loans].sort(
             (a, b) => {
 
                 const dateA =
@@ -451,7 +527,7 @@ function displayLoans() {
             `;
 
 
-            container.appendChild(
+            borrowerLoans.appendChild(
                 row
             );
 
@@ -463,22 +539,42 @@ function displayLoans() {
 
 
 /* ============================================================
-   CREATE LOAN
+   ERROR DISPLAY
 ============================================================ */
 
-document
-    .getElementById(
-        "createLoanBtn"
-    )
-    .addEventListener(
-        "click",
-        () => {
+function showBorrowerError(message) {
 
-            window.location.href =
-                `create-loan.html?borrowerId=${borrower.id}`;
+    borrowerName.textContent =
+        "Unable to load borrower";
 
-        }
-    );
+
+    borrowerPhone.textContent =
+        "--";
+
+
+    firstName.textContent =
+        "--";
+
+
+    lastName.textContent =
+        "--";
+
+
+    phone.textContent =
+        "--";
+
+
+    borrowerLoans.innerHTML = `
+
+        <div class="no-loans">
+
+            ${message}
+
+        </div>
+
+    `;
+
+}
 
 
 
@@ -486,4 +582,4 @@ document
    INITIALIZE
 ============================================================ */
 
-displayBorrower();
+loadBorrower();

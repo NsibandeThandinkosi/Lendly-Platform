@@ -3,111 +3,6 @@
 ============================================================ */
 
 
-/*
-    Hard-coded borrowers for now.
-
-    Later this data will come from Supabase.
-*/
-
-const borrowers = [
-
-    {
-        id: 1,
-
-        firstName: "Lerato",
-        lastName: "Mokoena",
-
-        phone: "071 234 5678",
-
-        loans: [
-
-            {
-                id: 101,
-                status: "settled",
-                amount: 12500,
-                date: "2026-04-10",
-                settlementDate: "2026-08-10",
-                nextDueDate: null
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 2,
-
-        firstName: "Sipho",
-        lastName: "Dlamini",
-
-        phone: "082 555 1234",
-
-        loans: [
-
-            {
-                id: 102,
-                status: "active",
-                amount: 8500,
-                date: "2026-08-01",
-                settlementDate: null,
-                nextDueDate: "2026-09-01"
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 3,
-
-        firstName: "Thabo",
-        lastName: "Nkosi",
-
-        phone: "079 876 5432",
-
-        loans: [
-
-            {
-                id: 103,
-                status: "overdue",
-                amount: 6500,
-                date: "2026-05-28",
-                settlementDate: null,
-                nextDueDate: "2026-08-15"
-            },
-
-            {
-                id: 104,
-                status: "settled",
-                amount: 6500,
-                date: "2026-01-20",
-                settlementDate: "2026-03-20",
-                nextDueDate: null
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 4,
-
-        firstName: "Ayanda",
-        lastName: "Ndlovu",
-
-        phone: "083 111 2233",
-
-        loans: []
-
-    }
-
-];
-
-
-
 /* ============================================================
    ELEMENTS
 ============================================================ */
@@ -138,12 +33,63 @@ const createBorrowerBtn =
 
 
 /* ============================================================
+   DATA
+============================================================ */
+
+/*
+    Borrowers are loaded from the server.
+
+    We do NOT hard-code borrowers here anymore.
+*/
+
+let borrowers = [];
+
+let sortedBorrowers = [];
+
+
+
+/* ============================================================
+   AUTHENTICATION
+============================================================ */
+
+function getAccessToken() {
+
+    const storedSession =
+        localStorage.getItem("lendlySession");
+
+    if (!storedSession) {
+        return null;
+    }
+
+    try {
+
+        const session =
+            JSON.parse(storedSession);
+
+        return session.access_token || null;
+
+    } catch (error) {
+
+        console.error(
+            "Unable to read login session:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+
+/* ============================================================
    HELPERS
 ============================================================ */
 
 function getFullName(borrower) {
 
-    return `${borrower.firstName} ${borrower.lastName}`;
+    return `${borrower.first_name} ${borrower.last_name}`;
 
 }
 
@@ -152,8 +98,8 @@ function getFullName(borrower) {
 function getInitials(borrower) {
 
     return (
-        borrower.firstName.charAt(0) +
-        borrower.lastName.charAt(0)
+        borrower.first_name.charAt(0) +
+        borrower.last_name.charAt(0)
     ).toUpperCase();
 
 }
@@ -175,44 +121,153 @@ function formatCurrency(amount) {
 
 
 
-function formatDate(date) {
+/*
+    There are currently no loans in the borrowers
+    table.
 
-    if (!date) {
-        return "--";
-    }
+    We will integrate this with the loans table
+    when we build the loans functionality.
+*/
 
-    return new Date(date).toLocaleDateString(
-        "en-ZA",
-        {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }
-    );
+function getCurrentLoan(borrower) {
+
+    return null;
 
 }
 
 
 
 /* ============================================================
-   GET CURRENT LOAN
+   LOAD BORROWERS
 ============================================================ */
 
-function getCurrentLoan(borrower) {
+async function loadBorrowers() {
 
-    /*
-        A borrower cannot have more than
-        one active/overdue loan.
+    const accessToken =
+        getAccessToken();
 
-        Therefore we can find either
-        active or overdue.
-    */
 
-    return borrower.loans.find(
-        loan =>
-            loan.status === "active" ||
-            loan.status === "overdue"
-    );
+    if (!accessToken) {
+
+        window.location.href =
+            "/login";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/borrowers",
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Borrower loading error:",
+                result
+            );
+
+
+            if (
+                response.status === 401
+            ) {
+
+                localStorage.removeItem(
+                    "lendlyUser"
+                );
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            throw new Error(
+                result.message ||
+                "Unable to load borrowers."
+            );
+
+        }
+
+
+        borrowers =
+            result.borrowers || [];
+
+
+        sortedBorrowers =
+            [...borrowers].sort(
+                (a, b) => {
+
+                    const nameA =
+                        getFullName(a)
+                            .toLowerCase();
+
+
+                    const nameB =
+                        getFullName(b)
+                            .toLowerCase();
+
+
+                    return nameA.localeCompare(
+                        nameB
+                    );
+
+                }
+            );
+
+
+        displayBorrowers(
+            sortedBorrowers
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading borrowers:",
+            error
+        );
+
+
+        borrowersList.innerHTML = `
+
+            <div class="borrowers-empty">
+
+                <h3>
+                    Unable to load borrowers
+                </h3>
+
+                <p>
+                    ${error.message}
+                </p>
+
+            </div>
+
+        `;
+
+        borrowerCount.textContent =
+            "0 borrowers";
+
+    }
 
 }
 
@@ -242,11 +297,11 @@ function displayBorrowers(list) {
             <div class="borrowers-empty">
 
                 <h3>
-                    No borrowers found
+                    You don't have any borrowers yet
                 </h3>
 
                 <p>
-                    Try another search or create a new borrower.
+                    Add your first borrower.
                 </p>
 
             </div>
@@ -304,7 +359,7 @@ function displayBorrowers(list) {
                 () => {
 
                     window.location.href =
-                        `borrower-detail.html?id=${borrower.id}`;
+                        `/borrowers/details?id=${borrower.id}`;
 
                 }
             );
@@ -363,13 +418,7 @@ function displayBorrowers(list) {
                         </span>
 
                         <strong>
-                            ${
-                                currentLoan
-                                    ? formatDate(
-                                        currentLoan.nextDueDate
-                                    )
-                                    : "--"
-                            }
+                            --
                         </strong>
 
                     </div>
@@ -404,29 +453,6 @@ function displayBorrowers(list) {
 
 
 /* ============================================================
-   SORT ALPHABETICALLY
-============================================================ */
-
-const sortedBorrowers =
-    [...borrowers].sort(
-        (a, b) => {
-
-            const nameA =
-                getFullName(a).toLowerCase();
-
-            const nameB =
-                getFullName(b).toLowerCase();
-
-            return nameA.localeCompare(
-                nameB
-            );
-
-        }
-    );
-
-
-
-/* ============================================================
    SEARCH
 ============================================================ */
 
@@ -450,8 +476,18 @@ borrowerSearch.addEventListener(
                         ).toLowerCase();
 
 
-                    return fullName.includes(
-                        searchTerm
+                    const phone =
+                        borrower.phone
+                            .toLowerCase();
+
+
+                    return (
+                        fullName.includes(
+                            searchTerm
+                        ) ||
+                        phone.includes(
+                            searchTerm
+                        )
                     );
 
                 }
@@ -475,13 +511,8 @@ createBorrowerBtn.addEventListener(
     "click",
     () => {
 
-        /*
-            We can replace this with a
-            proper create-borrower page later.
-        */
-
         window.location.href =
-            "create-borrower.html";
+            "/borrowers/create";
 
     }
 );
@@ -492,6 +523,4 @@ createBorrowerBtn.addEventListener(
    INITIALIZE
 ============================================================ */
 
-displayBorrowers(
-    sortedBorrowers
-);
+loadBorrowers();
