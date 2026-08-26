@@ -77,7 +77,6 @@ loginForm.addEventListener('submit', async (event) => {
             JSON.stringify(result.user)
         );
 
-
         showLoginMessage(
             'Login successful. Redirecting...',
             'success'

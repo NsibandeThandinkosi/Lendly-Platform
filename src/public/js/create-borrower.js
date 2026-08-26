@@ -8,54 +8,64 @@
 ============================================================ */
 
 const firstNameInput =
-    document.getElementById(
-        "firstName"
-    );
-
+    document.getElementById("firstName");
 
 const lastNameInput =
-    document.getElementById(
-        "lastName"
-    );
-
+    document.getElementById("lastName");
 
 const phoneInput =
-    document.getElementById(
-        "phone"
-    );
-
+    document.getElementById("phone");
 
 const createBorrowerBtn =
-    document.getElementById(
-        "createBorrowerBtn"
-    );
-
+    document.getElementById("createBorrowerBtn");
 
 const createLoanBtn =
-    document.getElementById(
-        "createLoanBtn"
-    );
-
+    document.getElementById("createLoanBtn");
 
 const borrowerNote =
-    document.getElementById(
-        "borrowerNote"
+    document.getElementById("borrowerNote");
+
+
+/* ============================================================
+   CREATED BORROWER
+============================================================ */
+
+let createdBorrower = null;
+
+
+/* ============================================================
+   GET LOGIN INFORMATION
+============================================================ */
+
+const storedUser =
+    JSON.parse(
+        localStorage.getItem("lendlyUser")
+    );
+
+const storedSession =
+    JSON.parse(
+        localStorage.getItem("lendlySession")
     );
 
 
 /* ============================================================
-   TEMPORARY BORROWER STORAGE
+   CHECK AUTHENTICATION
 ============================================================ */
 
-/*
-    For now we simulate the borrower database
-    using localStorage.
+if (
+    !storedUser ||
+    !storedUser.id ||
+    !storedSession ||
+    !storedSession.access_token
+) {
 
-    Later this can be replaced with a Supabase
-    INSERT operation.
-*/
+    alert(
+        "Your session could not be found. Please log in again."
+    );
 
-let createdBorrower = null;
+    window.location.href = "/login";
+
+}
 
 
 /* ============================================================
@@ -64,15 +74,13 @@ let createdBorrower = null;
 
 createBorrowerBtn.addEventListener(
     "click",
-    () => {
+    async () => {
 
         const firstName =
             firstNameInput.value.trim();
 
-
         const lastName =
             lastNameInput.value.trim();
-
 
         const phone =
             phoneInput.value.trim();
@@ -91,7 +99,6 @@ createBorrowerBtn.addEventListener(
             firstNameInput.focus();
 
             return;
-
         }
 
 
@@ -104,7 +111,6 @@ createBorrowerBtn.addEventListener(
             lastNameInput.focus();
 
             return;
-
         }
 
 
@@ -117,62 +123,163 @@ createBorrowerBtn.addEventListener(
             phoneInput.focus();
 
             return;
-
         }
 
 
         /* ====================================================
-           CREATE BORROWER
+           DISABLE BUTTON
         ==================================================== */
 
-        createdBorrower = {
-
-            id: Date.now(),
-
-            firstName: firstName,
-
-            lastName: lastName,
-
-            phone: phone,
-
-            loans: []
-
-        };
-
-
-        /*
-            Save the borrower temporarily.
-
-            Later this will be replaced with
-            Supabase.
-        */
-
-        localStorage.setItem(
-            "newBorrower",
-            JSON.stringify(
-                createdBorrower
-            )
-        );
-
-
-        /* ====================================================
-           ENABLE CREATE LOAN
-        ==================================================== */
-
-        createLoanBtn.disabled =
-            false;
-
-
-        borrowerNote.textContent =
-            `${firstName} ${lastName} has been created. You can now create a loan for this borrower.`;
-
+        createBorrowerBtn.disabled = true;
 
         createBorrowerBtn.textContent =
-            "Borrower Created";
+            "Creating Borrower...";
 
 
-        createBorrowerBtn.disabled =
-            true;
+        try {
+
+            /* =================================================
+               SEND REQUEST TO SERVER
+            ================================================= */
+
+            const response =
+                await fetch(
+                    "/api/borrowers",
+                    {
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json",
+
+                            /*
+                                Send the Supabase access token.
+
+                                Express will use this token when
+                                communicating with Supabase.
+
+                                This allows RLS to evaluate:
+
+                                auth.uid()
+                            */
+
+                            "Authorization":
+                                `Bearer ${storedSession.access_token}`
+
+                        },
+
+                        body: JSON.stringify({
+
+                            /*
+                                We still send lenderId for now.
+
+                                The server will verify that it
+                                matches the authenticated user.
+                            */
+
+                            lenderId:
+                                storedUser.id,
+
+                            firstName:
+                                firstName,
+
+                            lastName:
+                                lastName,
+
+                            phone:
+                                phone
+
+                        })
+                    }
+                );
+
+
+            /* =================================================
+               READ SERVER RESPONSE
+            ================================================= */
+
+            const result =
+                await response.json();
+
+
+            /* =================================================
+               HANDLE ERROR
+            ================================================= */
+
+            if (!response.ok) {
+
+                console.error(
+                    "Create borrower error:",
+                    result
+                );
+
+                alert(
+                    result.message ||
+                    "Unable to create borrower."
+                );
+
+                createBorrowerBtn.disabled =
+                    false;
+
+                createBorrowerBtn.textContent =
+                    "Create Borrower";
+
+                return;
+            }
+
+
+            /* =================================================
+               BORROWER CREATED
+            ================================================= */
+
+            createdBorrower =
+                result.borrower;
+
+
+            console.log(
+                "Borrower created:",
+                createdBorrower
+            );
+
+
+            /* =================================================
+               ENABLE CREATE LOAN
+            ================================================= */
+
+            createLoanBtn.disabled =
+                false;
+
+
+            borrowerNote.textContent =
+                `${createdBorrower.first_name} ${createdBorrower.last_name} has been created. You can now create a loan for this borrower.`;
+
+
+            createBorrowerBtn.textContent =
+                "Borrower Created";
+
+            createBorrowerBtn.disabled =
+                true;
+
+
+        } catch (error) {
+
+            console.error(
+                "Create borrower request failed:",
+                error
+            );
+
+            alert(
+                "Unable to connect to the server."
+            );
+
+            createBorrowerBtn.disabled =
+                false;
+
+            createBorrowerBtn.textContent =
+                "Create Borrower";
+
+        }
 
     }
 );
@@ -192,12 +299,15 @@ createLoanBtn.addEventListener(
         ) {
 
             return;
-
         }
 
 
+        /*
+            Supabase generated the real borrower UUID.
+        */
+
         window.location.href =
-            `create-loan.html?borrowerId=${createdBorrower.id}`;
+            `/create-loan.html?borrowerId=${createdBorrower.id}`;
 
     }
 );
