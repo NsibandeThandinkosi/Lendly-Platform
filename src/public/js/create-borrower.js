@@ -307,7 +307,7 @@ createLoanBtn.addEventListener(
         */
 
         window.location.href =
-            `/create-loan.html?borrowerId=${createdBorrower.id}`;
+            `/loans/create?borrowerId=${createdBorrower.id}`;
 
     }
 );

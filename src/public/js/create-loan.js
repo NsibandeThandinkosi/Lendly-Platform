@@ -4,150 +4,7 @@
 
 
 /* ============================================================
-   HARD-CODED BORROWERS
-============================================================ */
-
-const borrowers = [
-
-    {
-        id: 1,
-        firstName: "Lerato",
-        lastName: "Mokoena",
-        phone: "071 123 4567",
-
-        loans: [
-
-            {
-                date: "2026-04-10",
-                status: "settled"
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 2,
-        firstName: "Sipho",
-        lastName: "Dlamini",
-        phone: "072 234 5678",
-
-        loans: [
-
-            {
-                date: "2026-08-01",
-                status: "active"
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 3,
-        firstName: "Thabo",
-        lastName: "Nkosi",
-        phone: "073 345 6789",
-
-        loans: [
-
-            {
-                date: "2026-05-28",
-                status: "overdue"
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 4,
-        firstName: "Ayanda",
-        lastName: "Ndlovu",
-        phone: "074 456 7890",
-
-        loans: []
-
-    }
-
-];
-
-
-/* ============================================================
-   ELEMENTS
-============================================================ */
-
-const loanAmountInput =
-    document.getElementById(
-        "loanAmount"
-    );
-
-
-const loanDurationInput =
-    document.getElementById(
-        "loanDuration"
-    );
-
-
-const interestRateInput =
-    document.getElementById(
-        "interestRate"
-    );
-
-
-const serviceFeeInput =
-    document.getElementById(
-        "serviceFee"
-    );
-
-
-const interestLimit =
-    document.getElementById(
-        "interestLimit"
-    );
-
-
-const calculateBtn =
-    document.getElementById(
-        "calculateBtn"
-    );
-
-
-const createLoanBtn =
-    document.getElementById(
-        "createLoanBtn"
-    );
-
-
-const createLoanNote =
-    document.getElementById(
-        "createLoanNote"
-    );
-
-
-const borrowerName =
-    document.getElementById(
-        "borrowerName"
-    );
-
-
-const borrowerPhone =
-    document.getElementById(
-        "borrowerPhone"
-    );
-
-
-const borrowerInitials =
-    document.getElementById(
-        "borrowerInitials"
-    );
-
-
-/* ============================================================
-   URL BORROWER
+   GET BORROWER ID
 ============================================================ */
 
 const params =
@@ -155,156 +12,126 @@ const params =
         window.location.search
     );
 
-
 const borrowerId =
-    Number(
-        params.get("borrowerId")
-    );
+    params.get("borrowerId");
 
 
 /* ============================================================
-   FIND BORROWER
+   ELEMENTS
 ============================================================ */
 
-const borrower =
-    borrowers.find(
-        borrower =>
-            borrower.id === borrowerId
-    );
+const borrowerInitials =
+    document.getElementById("borrowerInitials");
+
+const borrowerName =
+    document.getElementById("borrowerName");
+
+const borrowerPhone =
+    document.getElementById("borrowerPhone");
+
+const loanAmount =
+    document.getElementById("loanAmount");
+
+const loanDuration =
+    document.getElementById("loanDuration");
+
+const interestRate =
+    document.getElementById("interestRate");
+
+const interestLimit =
+    document.getElementById("interestLimit");
+
+const serviceFee =
+    document.getElementById("serviceFee");
+
+const calculateBtn =
+    document.getElementById("calculateBtn");
+
+const calculatorResult =
+    document.getElementById("calculatorResult");
+
+const totalRepaymentAmount =
+    document.getElementById("totalRepayment");
+
+const monthlyPayment =
+    document.getElementById("monthlyPayment");
+
+const displayAmount =
+    document.getElementById("displayAmount");
+
+const displayInterest =
+    document.getElementById("displayInterest");
+
+const displayInitiationFee =
+    document.getElementById("displayInitiationFee");
+
+const displayServiceFees =
+    document.getElementById("displayServiceFees");
+
+const createLoanBtn =
+    document.getElementById("createLoanBtn");
+
+const createLoanNote =
+    document.getElementById("createLoanNote");
+
+const backLink =
+    document.getElementById("backLink");
 
 
 /* ============================================================
-   DISPLAY BORROWER
+   STATE
 ============================================================ */
 
-function displayBorrower() {
+let borrower = null;
 
-    if (!borrower) {
-
-        borrowerName.textContent =
-            "Borrower not found";
-
-        borrowerPhone.textContent =
-            "";
-
-        borrowerInitials.textContent =
-            "?";
-
-        createLoanBtn.disabled =
-            true;
-
-        createLoanNote.textContent =
-            "A valid borrower is required.";
-
-        return;
-
-    }
-
-
-    borrowerName.textContent =
-        `${borrower.firstName} ${borrower.lastName}`;
-
-
-    borrowerPhone.textContent =
-        borrower.phone;
-
-
-    borrowerInitials.textContent =
-        `${borrower.firstName.charAt(0)}${borrower.lastName.charAt(0)}`;
-
-
-    updateInterestLimit();
-
-}
+let calculatedLoan = null;
 
 
 /* ============================================================
-   CHECK FIRST LOAN OF YEAR
+   AUTHENTICATION
 ============================================================ */
 
-function isFirstLoanOfYear(
-    borrower
-) {
+function getAccessToken() {
 
-    if (!borrower) {
-
-        return true;
-
-    }
-
-
-    const currentYear =
-        new Date()
-            .getFullYear();
-
-
-    const hasLoanThisYear =
-        borrower.loans.some(
-            loan => {
-
-                const loanYear =
-                    new Date(
-                        loan.date
-                    ).getFullYear();
-
-
-                return (
-                    loanYear ===
-                    currentYear
-                );
-
-            }
+    const storedSession =
+        localStorage.getItem(
+            "lendlySession"
         );
 
+    if (!storedSession) {
 
-    return !hasLoanThisYear;
-
-}
-
-
-/* ============================================================
-   INTEREST LIMIT
-============================================================ */
-
-function updateInterestLimit() {
-
-    if (!borrower) {
-
-        return;
+        return null;
 
     }
 
+    try {
 
-    const firstLoan =
-        isFirstLoanOfYear(
-            borrower
+        const session =
+            JSON.parse(
+                storedSession
+            );
+
+        return (
+            session.access_token ||
+            null
         );
 
+    } catch (error) {
 
-    const maximumRate =
-        firstLoan
-            ? 5
-            : 3;
+        console.error(
+            "Unable to read session:",
+            error
+        );
 
+        return null;
 
-    interestRateInput.max =
-        maximumRate;
-
-
-    interestRateInput.value =
-        maximumRate;
-
-
-    interestLimit.textContent =
-        firstLoan
-            ? "First loan this year: maximum 5% per month."
-            : "Repeat loan this year: maximum 3% per month.";
+    }
 
 }
 
 
 /* ============================================================
-   FORMAT CURRENCY
+   FORMATTERS
 ============================================================ */
 
 function formatCurrency(amount) {
@@ -322,139 +149,232 @@ function formatCurrency(amount) {
 }
 
 
-/* ============================================================
-   INITIATION FEE
-============================================================ */
+function getInitials(borrower) {
 
-function getInitiationFee(
-    loanAmount
-) {
+    return (
+        borrower.first_name.charAt(0) +
+        borrower.last_name.charAt(0)
+    ).toUpperCase();
 
-    if (loanAmount > 1000) {
+}
 
-        return (
-            165 +
-            (
-                loanAmount -
-                1000
-            ) * 0.1
+
+
+async function checkActiveLoan() {
+
+    const accessToken =
+        getAccessToken();
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/borrowers/${encodeURIComponent(borrowerId)}/loans?status=active`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (
+            response.ok &&
+            result.loans &&
+            result.loans.length > 0
+        ) {
+
+            calculateBtn.disabled = true;
+
+            createLoanBtn.disabled = true;
+
+            createLoanNote.textContent =
+                "This borrower already has an active loan. A new loan cannot be created until it is settled.";
+
+            return true;
+
+        }
+
+        return false;
+
+    } catch (error) {
+
+        console.error(
+            "Active loan check failed:",
+            error
         );
 
+        return false;
+
     }
-
-
-    return 165;
 
 }
 
 
 /* ============================================================
-   VALIDATE INPUTS
+   LOAD BORROWER
 ============================================================ */
 
-function validateInputs() {
+async function loadBorrower() {
 
-    const amount =
-        Number(
-            loanAmountInput.value
+    if (!borrowerId) {
+
+        showError(
+            "No borrower was specified."
         );
 
+        return;
 
-    const duration =
-        Number(
-            loanDurationInput.value
+    }
+
+
+    const accessToken =
+        getAccessToken();
+
+
+    if (!accessToken) {
+
+        window.location.href =
+            "/login";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/borrowers/${encodeURIComponent(borrowerId)}`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Borrower loading error:",
+                result
+            );
+
+
+            if (
+                response.status === 401
+            ) {
+
+                localStorage.removeItem(
+                    "lendlySession"
+                );
+
+                localStorage.removeItem(
+                    "lendlyUser"
+                );
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            throw new Error(
+                result.message ||
+                "Unable to load borrower."
+            );
+
+        }
+
+
+        borrower =
+            result.borrower;
+
+
+        displayBorrower();
+
+        const hasActiveLoan =
+            await checkActiveLoan();
+
+        if (hasActiveLoan) {
+
+            return;
+
+        }
+
+
+        /*
+            Set the initial interest rate.
+
+            For now we use 5%.
+
+            We can later determine whether this
+            is the borrower's first loan of the
+            year by checking loan history.
+        */
+
+        interestRate.value = "5";
+
+        interestLimit.textContent =
+            "Maximum 5% per month for a first loan of the year.";
+
+    } catch (error) {
+
+        console.error(
+            "Load borrower error:",
+            error
         );
 
-
-    const interest =
-        Number(
-            interestRateInput.value
+        showError(
+            error.message
         );
 
+    }
 
-    const serviceFee =
-        Number(
-            serviceFeeInput.value
-        );
+}
 
+
+/* ============================================================
+   DISPLAY BORROWER
+============================================================ */
+
+function displayBorrower() {
 
     if (!borrower) {
 
-        alert(
-            "A valid borrower is required."
-        );
-
-        return false;
+        return;
 
     }
 
 
-    if (amount <= 0) {
-
-        alert(
-            "Please enter a valid loan amount."
-        );
-
-        return false;
-
-    }
-
-
-    if (
-        duration < 1 ||
-        duration > 5
-    ) {
-
-        alert(
-            "Loan duration must be between 1 and 5 months."
-        );
-
-        return false;
-
-    }
-
-
-    if (
-        serviceFee < 0 ||
-        serviceFee > 60
-    ) {
-
-        alert(
-            "The monthly service fee cannot exceed R60."
-        );
-
-        return false;
-
-    }
-
-
-    const firstLoan =
-        isFirstLoanOfYear(
+    borrowerInitials.textContent =
+        getInitials(
             borrower
         );
 
 
-    const maximumRate =
-        firstLoan
-            ? 5
-            : 3;
+    borrowerName.textContent =
+        `${borrower.first_name} ${borrower.last_name}`;
 
 
-    if (
-        interest < 0 ||
-        interest > maximumRate
-    ) {
-
-        alert(
-            `The maximum interest rate for this borrower is ${maximumRate}% per month.`
-        );
-
-        return false;
-
-    }
-
-
-    return true;
+    borrowerPhone.textContent =
+        borrower.phone;
 
 }
 
@@ -463,240 +383,440 @@ function validateInputs() {
    CALCULATE LOAN
 ============================================================ */
 
-calculateBtn.addEventListener(
-    "click",
-    () => {
+function calculateLoan() {
 
-        if (!validateInputs()) {
+    const amount =
+        Number(
+            loanAmount.value
+        );
 
-            return;
+    const duration =
+        Number(
+            loanDuration.value
+        );
 
-        }
+    const rate =
+        Number(
+            interestRate.value
+        );
 
-
-        const loanAmount =
-            Number(
-                loanAmountInput.value
-            );
-
-
-        const loanDuration =
-            Number(
-                loanDurationInput.value
-            );
-
-
-        const interestRate =
-            Number(
-                interestRateInput.value
-            );
+    const monthlyFee =
+        Number(
+            serviceFee.value
+        );
 
 
-        const serviceFee =
-            Number(
-                serviceFeeInput.value
-            );
+    /* ========================================================
+       VALIDATION
+    ======================================================== */
 
+    if (!amount || amount <= 0 || amount > 8000) {
 
-        /* ====================================================
-           INTEREST
-        ==================================================== */
+        alert(
+            "Please enter a valid loan amount."
+        );
 
-        const totalInterest =
-            loanAmount *
-            (
-                interestRate / 100
-            ) *
-            loanDuration;
+        loanAmount.focus();
 
-
-        /* ====================================================
-           SERVICE FEES
-        ==================================================== */
-
-        const totalServiceFees =
-            serviceFee *
-            loanDuration;
-
-
-        /* ====================================================
-           INITIATION FEE
-        ==================================================== */
-
-        const initiationFee =
-            getInitiationFee(
-                loanAmount
-            );
-
-
-        /* ====================================================
-           TOTAL REPAYMENT
-        ==================================================== */
-
-        const totalRepayment =
-            loanAmount +
-            totalInterest +
-            totalServiceFees +
-            initiationFee;
-
-
-        /* ====================================================
-           MONTHLY PAYMENT
-        ==================================================== */
-
-        const monthlyPayment =
-            totalRepayment /
-            loanDuration;
-
-
-        /* ====================================================
-           DISPLAY RESULTS
-        ==================================================== */
-
-        document.getElementById(
-            "totalRepayment"
-        ).textContent =
-            formatCurrency(
-                totalRepayment
-            );
-
-
-        document.getElementById(
-            "monthlyPayment"
-        ).textContent =
-            formatCurrency(
-                monthlyPayment
-            );
-
-
-        document.getElementById(
-            "displayAmount"
-        ).textContent =
-            formatCurrency(
-                loanAmount
-            );
-
-
-        document.getElementById(
-            "displayInterest"
-        ).textContent =
-            formatCurrency(
-                totalInterest
-            );
-
-
-        document.getElementById(
-            "displayInitiationFee"
-        ).textContent =
-            formatCurrency(
-                initiationFee
-            );
-
-
-        document.getElementById(
-            "displayServiceFees"
-        ).textContent =
-            formatCurrency(
-                totalServiceFees
-            );
-
-
-        /* ====================================================
-           ENABLE CREATE
-        ==================================================== */
-
-        createLoanBtn.disabled =
-            false;
-
-
-        createLoanNote.textContent =
-            "The loan has been calculated and is ready to be created.";
+        return;
 
     }
-);
 
 
-/* ============================================================
-   SERVICE FEE VALIDATION
-============================================================ */
+    if (
+        !duration ||
+        duration < 1 ||
+        duration > 6
+    ) {
 
-serviceFeeInput.addEventListener(
-    "input",
-    () => {
+        alert(
+            "Loan duration must be between 1 and 6 months."
+        );
 
-        if (
-            Number(
-                serviceFeeInput.value
-            ) > 60
-        ) {
+        loanDuration.focus();
 
-            serviceFeeInput.value =
-                60;
-
-        }
+        return;
 
     }
-);
+
+
+    if (
+        rate < 0 ||
+        rate > 5
+    ) {
+
+        alert(
+            "Interest rate cannot exceed 5% per month."
+        );
+
+        interestRate.focus();
+
+        return;
+
+    }
+
+
+    if (
+        monthlyFee < 0 ||
+        monthlyFee > 60
+    ) {
+
+        alert(
+            "Monthly service fee cannot exceed R60."
+        );
+
+        serviceFee.focus();
+
+        return;
+
+    }
+
+
+    /* ========================================================
+       CALCULATION
+    ======================================================== */
+
+    /*
+        Simple monthly interest.
+
+        Example:
+
+        R8,000
+        3 months
+        5%
+
+        Interest:
+        8000 × 0.05 × 3
+        = R1,200
+    */
+
+    const totalInterest =
+        amount *
+        (rate / 100) *
+        duration;
+
+
+    /*
+        Service fees are charged monthly.
+    */
+
+    const totalServiceFees =
+        monthlyFee *
+        duration;
+
+
+    /*
+        No separate initiation fee is currently
+        entered on the form, so we keep it at zero.
+
+        We can add the real initiation-fee rule
+        later once that business rule is defined.
+    */
+
+    const initiationFee = amount <= 1000 
+    ? amount * 0.15 
+    : 165 + (0.10 * (amount - 1000));
+
+    const totalRepaymentAmount =
+        amount +
+        totalInterest +
+        initiationFee +
+        totalServiceFees;
+
+
+    const monthlyPaymentAmount =
+        totalRepaymentAmount /
+        duration;
+
+
+    /* ========================================================
+       SAVE CALCULATION
+    ======================================================== */
+
+    calculatedLoan = {
+
+        borrowerId:
+            borrower.id,
+
+        principalAmount:
+            amount,
+
+        durationMonths:
+            duration,
+
+        interestRate:
+            rate,
+
+        monthlyServiceFee:
+            monthlyFee,
+
+        initiationFee:
+            initiationFee,
+
+        totalInterest:
+            totalInterest,
+
+        totalServiceFees:
+            totalServiceFees,
+
+        totalRepayment:
+            totalRepaymentAmount,
+
+        monthlyPayment:
+            monthlyPaymentAmount
+
+    };
+
+
+    /* ========================================================
+       DISPLAY RESULTS
+    ======================================================== */
+
+    totalRepayment.textContent =
+        formatCurrency(
+            totalRepaymentAmount
+        );
+
+
+    monthlyPayment.textContent =
+        formatCurrency(
+            monthlyPaymentAmount
+        );
+
+
+    displayAmount.textContent =
+        formatCurrency(
+            amount
+        );
+
+
+    displayInterest.textContent =
+        formatCurrency(
+            totalInterest
+        );
+
+
+    displayInitiationFee.textContent =
+        formatCurrency(
+            initiationFee
+        );
+
+
+    displayServiceFees.textContent =
+        formatCurrency(
+            totalServiceFees
+        );
+
+
+    calculatorResult.classList.add(
+        "visible"
+    );
+
+
+    createLoanBtn.disabled =
+        false;
+
+
+    createLoanNote.textContent =
+        "Review the repayment details, then create the loan.";
+
+}
 
 
 /* ============================================================
    CREATE LOAN
 ============================================================ */
 
-createLoanBtn.addEventListener(
-    "click",
-    () => {
+async function createLoan() {
 
-        if (
-            createLoanBtn.disabled
-        ) {
-
-            return;
-
-        }
-
-
-        if (!borrower) {
-
-            alert(
-                "A valid borrower is required."
-            );
-
-            return;
-
-        }
-
-
-        const confirmed =
-            confirm(
-                `Create this loan for ${borrower.firstName} ${borrower.lastName}?`
-            );
-
-
-        if (!confirmed) {
-
-            return;
-
-        }
-
-
-        /*
-            For now we only simulate
-            creating the loan.
-
-            Later this will insert the
-            loan into Supabase.
-        */
+    if (!calculatedLoan) {
 
         alert(
-            "Loan created successfully."
+            "Please calculate the loan first."
+        );
+
+        return;
+
+    }
+
+
+    const accessToken =
+        getAccessToken();
+
+
+    if (!accessToken) {
+
+        window.location.href =
+            "/login";
+
+        return;
+
+    }
+
+
+    createLoanBtn.disabled =
+        true;
+
+
+    createLoanBtn.textContent =
+        "Creating Loan...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/loans",
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${accessToken}`
+
+                    },
+
+                    body: JSON.stringify({
+
+                        borrowerId:
+                            calculatedLoan.borrowerId,
+
+                        principalAmount:
+                            calculatedLoan.principalAmount,
+
+                        durationMonths:
+                            calculatedLoan.durationMonths,
+
+                        interestRate:
+                            calculatedLoan.interestRate,
+
+                        monthlyServiceFee:
+                            calculatedLoan.monthlyServiceFee,
+
+                        initiationFee:
+                            calculatedLoan.initiationFee,
+
+                        totalInterest:
+                            calculatedLoan.totalInterest,
+
+                        totalRepayment:
+                            calculatedLoan.totalRepayment,
+
+                        monthlyPayment:
+                            calculatedLoan.monthlyPayment
+
+                    })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Create loan error:",
+                result
+            );
+
+            alert(
+                result.message ||
+                "Unable to create loan."
+            );
+
+            createLoanBtn.disabled =
+                false;
+
+            createLoanBtn.textContent =
+                "Create Loan";
+
+            return;
+
+        }
+
+
+        console.log(
+            "Loan created:",
+            result.loan
         );
 
 
+        /*
+            Go back to borrower details.
+
+            This means the user immediately sees
+            the loan attached to this borrower.
+        */
+
         window.location.href =
-            `borrower-detail.html?id=${borrower.id}`;
+            `/borrowers/details?id=${borrower.id}`;
+
+    } catch (error) {
+
+        console.error(
+            "Create loan request failed:",
+            error
+        );
+
+        alert(
+            "Unable to connect to the server."
+        );
+
+        createLoanBtn.disabled =
+            false;
+
+        createLoanBtn.textContent =
+            "Create Loan";
 
     }
+
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+function showError(message) {
+
+    borrowerName.textContent =
+        "Unable to load borrower";
+
+    borrowerPhone.textContent =
+        message;
+
+    borrowerInitials.textContent =
+        "--";
+
+    createLoanBtn.disabled =
+        true;
+
+    calculateBtn.disabled =
+        true;
+
+}
+
+
+/* ============================================================
+   EVENTS
+============================================================ */
+
+calculateBtn.addEventListener(
+    "click",
+    calculateLoan
+);
+
+
+createLoanBtn.addEventListener(
+    "click",
+    createLoan
 );
 
 
@@ -704,4 +824,4 @@ createLoanBtn.addEventListener(
    INITIALIZE
 ============================================================ */
 
-displayBorrower();
+loadBorrower();

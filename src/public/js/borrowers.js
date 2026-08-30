@@ -33,7 +33,7 @@ const createBorrowerBtn =
 
 
 /* ============================================================
-   DATA
+   DATA  BORROWERS
 ============================================================ */
 
 /*
@@ -49,7 +49,7 @@ let sortedBorrowers = [];
 
 
 /* ============================================================
-   AUTHENTICATION
+   GET ACCESS TOKEN
 ============================================================ */
 
 function getAccessToken() {
@@ -80,7 +80,6 @@ function getAccessToken() {
     }
 
 }
-
 
 
 /* ============================================================
@@ -131,7 +130,25 @@ function formatCurrency(amount) {
 
 function getCurrentLoan(borrower) {
 
-    return null;
+    if (
+        !borrower.loans ||
+        borrower.loans.length === 0
+    ) {
+
+        return null;
+
+    }
+
+
+    const currentLoan =
+        borrower.loans.find(
+            loan =>
+                loan.status === "active" ||
+                loan.status === "overdue"
+        );
+
+
+    return currentLoan || null;
 
 }
 
@@ -180,14 +197,16 @@ async function loadBorrowers() {
         if (!response.ok) {
 
             console.error(
-                "Borrower loading error:",
+                "Borrowers loading error:",
                 result
             );
 
 
-            if (
-                response.status === 401
-            ) {
+            if (response.status === 401) {
+
+                localStorage.removeItem(
+                    "lendlySession"
+                );
 
                 localStorage.removeItem(
                     "lendlyUser"
@@ -218,14 +237,10 @@ async function loadBorrowers() {
                 (a, b) => {
 
                     const nameA =
-                        getFullName(a)
-                            .toLowerCase();
-
+                        getFullName(a).toLowerCase();
 
                     const nameB =
-                        getFullName(b)
-                            .toLowerCase();
-
+                        getFullName(b).toLowerCase();
 
                     return nameA.localeCompare(
                         nameB
@@ -263,9 +278,6 @@ async function loadBorrowers() {
             </div>
 
         `;
-
-        borrowerCount.textContent =
-            "0 borrowers";
 
     }
 
@@ -418,7 +430,12 @@ function displayBorrowers(list) {
                         </span>
 
                         <strong>
-                            --
+                            ${
+                                currentLoan &&
+                                currentLoan.nextDueDate
+                                    ? currentLoan.nextDueDate
+                                    : "--"
+                            }
                         </strong>
 
                     </div>

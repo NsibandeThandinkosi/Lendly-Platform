@@ -551,7 +551,6 @@ app.get('/api/borrowers', async (req, res) => {
         const authHeader =
             req.headers.authorization;
 
-
         if (
             !authHeader ||
             !authHeader.startsWith('Bearer ')
@@ -564,12 +563,10 @@ app.get('/api/borrowers', async (req, res) => {
 
         }
 
-
         const accessToken =
             authHeader
                 .replace('Bearer ', '')
                 .trim();
-
 
         if (!accessToken) {
 
@@ -582,7 +579,7 @@ app.get('/api/borrowers', async (req, res) => {
 
 
         // ==========================================
-        // CREATE AUTHENTICATED SUPABASE CLIENT
+        // AUTHENTICATED SUPABASE CLIENT
         // ==========================================
 
         const authenticatedSupabase =
@@ -614,7 +611,8 @@ app.get('/api/borrowers', async (req, res) => {
                 user
             },
             error: userError
-        } = await authenticatedSupabase.auth.getUser();
+        } =
+            await authenticatedSupabase.auth.getUser();
 
 
         if (
@@ -629,7 +627,8 @@ app.get('/api/borrowers', async (req, res) => {
 
             return res.status(401).json({
                 success: false,
-                message: 'Your session is invalid or expired.'
+                message:
+                    'Your session is invalid or expired.'
             });
 
         }
@@ -639,31 +638,16 @@ app.get('/api/borrowers', async (req, res) => {
         // GET BORROWERS
         // ==========================================
 
-        /*
-            We deliberately DO NOT add:
-
-                .eq('lender_id', user.id)
-
-            here.
-
-            The RLS policy already says:
-
-                lender_id = auth.uid()
-
-            Because this request is authenticated with
-            the user's access token, Supabase will only
-            return borrowers belonging to this user.
-        */
-
         const {
             data: borrowers,
             error: borrowersError
-        } = await authenticatedSupabase
-            .from('borrowers')
-            .select('*')
-            .order('first_name', {
-                ascending: true
-            });
+        } =
+            await authenticatedSupabase
+                .from('borrowers')
+                .select('*')
+                .order('first_name', {
+                    ascending: true
+                });
 
 
         if (borrowersError) {
@@ -675,10 +659,113 @@ app.get('/api/borrowers', async (req, res) => {
 
             return res.status(500).json({
                 success: false,
-                message: 'Unable to load borrowers.'
+                message:
+                    'Unable to load borrowers.'
             });
 
         }
+
+
+        // ==========================================
+        // GET LOANS
+        // ==========================================
+
+        const {
+            data: loans,
+            error: loansError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .select('*')
+                .order('created_at', {
+                    ascending: false
+                });
+
+
+        if (loansError) {
+
+            console.error(
+                'Loans fetch error:',
+                loansError
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to load borrower loans.'
+            });
+
+        }
+
+
+        // ==========================================
+        // ATTACH LOANS TO BORROWERS
+        // ==========================================
+
+        const borrowersWithLoans =
+            (borrowers || []).map(
+                borrower => {
+
+                    const borrowerLoans =
+                        (loans || [])
+                            .filter(
+                                loan =>
+                                    loan.borrower_id ===
+                                    borrower.id
+                            )
+                            .map(
+                                loan => ({
+
+                                    id:
+                                        loan.id,
+
+                                    status:
+                                        loan.status,
+
+                                    amount:
+                                        Number(
+                                            loan.principal_amount
+                                        ),
+
+                                    totalRepayment:
+                                        Number(
+                                            loan.total_repayment
+                                        ),
+
+                                    monthlyPayment:
+                                        Number(
+                                            loan.monthly_payment
+                                        ),
+
+                                    date:
+                                        loan.start_date,
+
+                                    nextDueDate:
+                                        loan.next_due_date,
+
+                                    interestRate:
+                                        Number(
+                                            loan.interest_rate
+                                        ),
+
+                                    durationMonths:
+                                        loan.duration_months
+
+                                })
+                            );
+
+
+                    return {
+
+                        ...borrower,
+
+                        loans:
+                            borrowerLoans
+
+                    };
+
+                }
+            );
 
 
         // ==========================================
@@ -689,7 +776,8 @@ app.get('/api/borrowers', async (req, res) => {
 
             success: true,
 
-            borrowers: borrowers || []
+            borrowers:
+                borrowersWithLoans
 
         });
 
@@ -758,7 +846,7 @@ app.get('/api/borrowers/:id', async (req, res) => {
 
 
         // ==========================================
-        // CREATE AUTHENTICATED SUPABASE CLIENT
+        // AUTHENTICATED SUPABASE CLIENT
         // ==========================================
 
         const authenticatedSupabase =
@@ -790,7 +878,8 @@ app.get('/api/borrowers/:id', async (req, res) => {
                 user
             },
             error: userError
-        } = await authenticatedSupabase.auth.getUser();
+        } =
+            await authenticatedSupabase.auth.getUser();
 
 
         if (
@@ -805,7 +894,8 @@ app.get('/api/borrowers/:id', async (req, res) => {
 
             return res.status(401).json({
                 success: false,
-                message: 'Your session is invalid or expired.'
+                message:
+                    'Your session is invalid or expired.'
             });
 
         }
@@ -823,7 +913,8 @@ app.get('/api/borrowers/:id', async (req, res) => {
 
             return res.status(400).json({
                 success: false,
-                message: 'Borrower ID is required.'
+                message:
+                    'Borrower ID is required.'
             });
 
         }
@@ -833,27 +924,15 @@ app.get('/api/borrowers/:id', async (req, res) => {
         // GET BORROWER
         // ==========================================
 
-        /*
-            Notice that we only search by ID.
-
-            We don't need to manually check:
-
-                lender_id = user.id
-
-            because the SELECT RLS policy handles that.
-
-            If the borrower belongs to another lender,
-            Supabase will not return it.
-        */
-
         const {
             data: borrower,
             error: borrowerError
-        } = await authenticatedSupabase
-            .from('borrowers')
-            .select('*')
-            .eq('id', borrowerId)
-            .single();
+        } =
+            await authenticatedSupabase
+                .from('borrowers')
+                .select('*')
+                .eq('id', borrowerId)
+                .single();
 
 
         if (borrowerError) {
@@ -865,10 +944,128 @@ app.get('/api/borrowers/:id', async (req, res) => {
 
             return res.status(404).json({
                 success: false,
-                message: 'Borrower not found.'
+                message:
+                    'Borrower not found.'
             });
 
         }
+
+
+        // ==========================================
+        // GET LOANS FOR BORROWER
+        // ==========================================
+
+        const {
+            data: loans,
+            error: loansError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .select('*')
+                .eq('borrower_id', borrowerId)
+                .order('created_at', {
+                    ascending: false
+                });
+
+
+        if (loansError) {
+
+            console.error(
+                'Borrower loans fetch error:',
+                loansError
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to load borrower loans.'
+            });
+
+        }
+
+
+        // ==========================================
+        // FORMAT LOANS FOR FRONTEND
+        // ==========================================
+
+        const formattedLoans =
+            (loans || []).map(
+                loan => ({
+
+                    id:
+                        loan.id,
+
+                    status:
+                        loan.status,
+
+                    originalAmount:
+                        Number(
+                            loan.principal_amount
+                        ),
+
+                    principalAmount:
+                        Number(
+                            loan.principal_amount
+                        ),
+
+                    totalInterest:
+                        Number(
+                            loan.total_interest
+                        ),
+
+                    totalRepayment:
+                        Number(
+                            loan.total_repayment
+                        ),
+
+                    monthlyPayment:
+                        Number(
+                            loan.monthly_payment
+                        ),
+
+                    interestRate:
+                        Number(
+                            loan.interest_rate
+                        ),
+
+                    durationMonths:
+                        loan.duration_months,
+
+                    serviceFee:
+                        Number(
+                            loan.monthly_service_fee
+                        ),
+
+                    initiationFee:
+                        Number(
+                            loan.initiation_fee
+                        ),
+
+                    date:
+                        loan.start_date,
+
+                    nextDueDate:
+                        loan.next_due_date,
+
+                    settlementDate:
+                        null
+
+                })
+            );
+
+
+        // ==========================================
+        // ATTACH LOANS TO BORROWER
+        // ==========================================
+
+        const borrowerWithLoans = {
+
+            ...borrower,
+
+            loans:
+                formattedLoans
+
+        };
 
 
         // ==========================================
@@ -879,7 +1076,8 @@ app.get('/api/borrowers/:id', async (req, res) => {
 
             success: true,
 
-            borrower: borrower
+            borrower:
+                borrowerWithLoans
 
         });
 
@@ -900,6 +1098,636 @@ app.get('/api/borrowers/:id', async (req, res) => {
     }
 
 });
+
+// ==============================
+// Create loan page
+// ==============================
+app.get('/loans/create', (req, res) => {
+    res.sendFile(
+        path.join(
+            __dirname,
+            'src',
+            'public',
+            'html',
+            'create-loan.html'
+        )
+    );
+});
+
+// =============================
+// CREATE LOAN
+// =============================
+
+app.post('/api/loans', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            console.error(
+                'Authentication error:',
+                userError
+            );
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET FORM DATA
+        // ==========================================
+
+        const {
+            borrowerId,
+            principalAmount,
+            durationMonths,
+            interestRate,
+            monthlyServiceFee,
+            initiationFee,
+            totalInterest,
+            totalRepayment,
+            monthlyPayment
+        } = req.body;
+
+
+        // ==========================================
+        // VALIDATION
+        // ==========================================
+
+        if (!borrowerId) {
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    'Borrower ID is required.'
+            });
+
+        }
+
+
+        if (
+            principalAmount === undefined ||
+            Number(principalAmount) <= 0
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    'Please enter a valid loan amount.'
+            });
+
+        }
+
+
+        if (
+            durationMonths === undefined ||
+            Number(durationMonths) < 1 ||
+            Number(durationMonths) > 5
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    'Loan duration must be between 1 and 5 months.'
+            });
+
+        }
+
+
+        if (
+            interestRate === undefined ||
+            Number(interestRate) < 0 ||
+            Number(interestRate) > 5
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    'Interest rate must be between 0% and 5%.'
+            });
+
+        }
+
+
+        if (
+            monthlyServiceFee === undefined ||
+            Number(monthlyServiceFee) < 0 ||
+            Number(monthlyServiceFee) > 60
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    'Monthly service fee must be between R0 and R60.'
+            });
+
+        }
+
+
+        // ==========================================
+        // VERIFY BORROWER
+        // ==========================================
+
+        /*
+            We explicitly verify that the borrower
+            belongs to the authenticated lender.
+
+            RLS also protects this relationship,
+            but checking here lets us return a useful
+            error instead of a generic database error.
+        */
+
+        const {
+            data: borrower,
+            error: borrowerError
+        } =
+            await authenticatedSupabase
+                .from('borrowers')
+                .select('id, lender_id, first_name, last_name')
+                .eq('id', borrowerId)
+                .single();
+
+
+        if (borrowerError || !borrower) {
+
+            console.error(
+                'Borrower lookup error:',
+                borrowerError
+            );
+
+            return res.status(404).json({
+                success: false,
+                message:
+                    'Borrower not found or does not belong to you.'
+            });
+
+        }
+
+
+        // ==========================================
+        // CHECK FOR EXISTING ACTIVE LOAN
+        // ==========================================
+
+        /*
+            Business rule: a borrower cannot have
+            more than one active loan at a time.
+        */
+
+        const {
+            data: activeLoans,
+            error: activeLoanError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .select('id')
+                .eq('borrower_id', borrowerId)
+                .eq('status', 'active');
+
+
+        if (activeLoanError) {
+
+            console.error(
+                'Active loan check error:',
+                activeLoanError
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to verify existing loans.'
+            });
+
+        }
+
+
+        if (
+            activeLoans &&
+            activeLoans.length > 0
+        ) {
+
+            return res.status(409).json({
+                success: false,
+                message:
+                    'This borrower already has an active loan.'
+            });
+
+        }
+
+        // ==========================================
+        // COMPUTE DATES
+        // ==========================================
+
+        const startDate =
+            new Date();
+
+        const nextDueDate =
+            new Date(startDate);
+
+        nextDueDate.setMonth(
+            nextDueDate.getMonth() + 1
+        );
+
+
+        // ==========================================
+        // CREATE LOAN
+        // ==========================================
+
+        /*
+            IMPORTANT:
+
+            We do NOT accept lenderId from the browser.
+
+            The lender ID comes directly from the
+            authenticated Supabase user.
+        */
+
+        const {
+            data: loan,
+            error: loanError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .insert({
+
+                    lender_id:
+                        user.id,
+
+                    borrower_id:
+                        borrowerId,
+
+                    principal_amount:
+                        Number(principalAmount),
+
+                    duration_months:
+                        Number(durationMonths),
+
+                    interest_rate:
+                        Number(interestRate),
+
+                    monthly_service_fee:
+                        Number(monthlyServiceFee),
+
+                    initiation_fee:
+                        Number(initiationFee || 0),
+
+                    total_interest:
+                        Number(totalInterest || 0),
+
+                    total_repayment:
+                        Number(totalRepayment),
+
+                    monthly_payment:
+                        Number(monthlyPayment),
+
+                    remaining_amount:
+                        Number(totalRepayment),
+
+                    status:
+                        'active',
+
+                    start_date:
+                        startDate
+                            .toISOString()
+                            .split('T')[0],
+
+                    next_due_date:
+                        nextDueDate
+                            .toISOString()
+                            .split('T')[0]
+
+                })
+                .select()
+                .single();
+
+
+        // ==========================================
+        // DATABASE ERROR
+        // ==========================================
+
+        if (loanError) {
+
+            console.error(
+                'Loan creation error:',
+                loanError
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to create loan.'
+            });
+
+        }
+
+
+        // ==========================================
+        // SUCCESS
+        // ==========================================
+
+        return res.status(201).json({
+
+            success: true,
+
+            message:
+                'Loan created successfully.',
+
+            loan
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            'Create loan error:',
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while creating the loan.'
+        });
+
+    }
+
+});
+
+
+// =============================
+// GET LOANS FOR BORROWER
+// =============================
+
+app.get('/api/loans', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET BORROWER ID
+        // ==========================================
+
+        const borrowerId =
+            req.query.borrowerId;
+
+
+        if (!borrowerId) {
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    'Borrower ID is required.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET LOANS
+        // ==========================================
+
+        /*
+            We don't need to manually add:
+
+                lender_id = user.id
+
+            because the SELECT RLS policy handles it.
+
+            RLS guarantees that only this lender's
+            loans can be returned.
+        */
+
+        const {
+            data: loans,
+            error: loansError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .select('*')
+                .eq('borrower_id', borrowerId)
+                .order('created_at', {
+                    ascending: false
+                });
+
+
+        if (loansError) {
+
+            console.error(
+                'Loans fetch error:',
+                loansError
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to load loans.'
+            });
+
+        }
+
+
+        // ==========================================
+        // SUCCESS
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            loans:
+                loans || []
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            'Get loans error:',
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while loading loans.'
+        });
+
+    }
+
+});
+
+
+
 
 
 // =============================

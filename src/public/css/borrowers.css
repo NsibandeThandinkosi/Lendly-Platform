@@ -263,6 +263,10 @@
 
     gap: 13px;
 
+    width: 200px;
+
+    flex-shrink: 0;
+
 }
 
 
@@ -301,6 +305,12 @@
 
     margin-bottom: 4px;
 
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
 }
 
 
@@ -310,6 +320,12 @@
 
     font-size: 9px;
 
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
 }
 
 
@@ -318,13 +334,9 @@
 ============================================================ */
 
 .borrower-loan-info {
-
-    display: flex;
-
+    display: grid;
+    grid-template-columns: 90px 110px 70px;
     align-items: center;
-
-    gap: 35px;
-
 }
 
 
@@ -351,7 +363,6 @@
 
 
 .loan-status {
-
     padding: 5px 9px;
 
     border-radius: 20px;
@@ -359,6 +370,8 @@
     font-size: 8px;
 
     font-weight: 700;
+
+    justify-self: start;
 
 }
 
