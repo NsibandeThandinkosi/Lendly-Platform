@@ -280,6 +280,76 @@ async function loadBorrower() {
 }
 
 
+/* ============================================================
+   LOAD LOANS FOR BORROWER
+============================================================ */
+
+async function loadLoans(borrowerId) {
+
+    const accessToken =
+        getAccessToken();
+
+    if (!accessToken) {
+
+        window.location.href = "/login";
+
+        return [];
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/borrowers/${encodeURIComponent(borrowerId)}/loans`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Loan loading error:",
+                result
+            );
+
+            throw new Error(
+                result.message ||
+                "Unable to load loans."
+            );
+
+        }
+
+
+        return result.loans || [];
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading loans:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
 
 /* ============================================================
    DISPLAY BORROWER
@@ -299,9 +369,7 @@ function displayBorrower(borrower) {
 
 
     borrowerAvatar.textContent =
-        getInitials(
-            borrower
-        );
+        getInitials(borrower);
 
 
     borrowerName.textContent =
@@ -324,15 +392,10 @@ function displayBorrower(borrower) {
         borrower.phone;
 
 
-    /*
-        The borrowers table currently doesn't
-        contain loan information.
-
-        We will connect loans here once the
-        loans table/API is implemented.
-    */
-
-    displayLoans([]);
+    // Display the loans returned by the API
+    displayLoans(
+        borrower.loans || []
+    );
 
 
     createLoanBtn.addEventListener(
@@ -340,7 +403,7 @@ function displayBorrower(borrower) {
         () => {
 
             window.location.href =
-                `/create-loan.html?borrowerId=${borrower.id}`;
+             `/loans/create?borrowerId=${borrower.id}`;
 
         }
     );
@@ -442,19 +505,13 @@ function displayLoans(loans) {
 
 
             const amount =
-                loan.status === "settled"
-                    ? formatCurrency(
-                        loan.totalAmount
-                    )
-                    : formatCurrency(
-                        loan.remainingAmount
-                    );
+                formatCurrency(
+                loan.totalRepayment
+                );
 
 
             const amountLabel =
-                loan.status === "settled"
-                    ? "Total Paid"
-                    : "Remaining";
+                "Total Repayment";
 
 
             const dateLabel =
