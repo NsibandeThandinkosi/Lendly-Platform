@@ -4,13 +4,10 @@
 
 
 // ============================================================
-// GET LOANS
+// STATE
 // ============================================================
 
-let loans =
-    JSON.parse(
-        localStorage.getItem("lendlyLoans")
-    ) || [];
+let loan = null;
 
 
 // ============================================================
@@ -32,15 +29,8 @@ const shouldEdit =
 
 
 // ============================================================
-// FIND LOAN
+// ELEMENTS
 // ============================================================
-
-const loan =
-    loans.find(
-        item =>
-            item.id === loanId
-    );
-
 
 const loanDetails =
     document.getElementById(
@@ -49,42 +39,44 @@ const loanDetails =
 
 
 // ============================================================
-// IF LOAN DOES NOT EXIST
+// AUTHENTICATION
 // ============================================================
 
-if (!loan) {
+function getAccessToken() {
 
-    loanDetails.innerHTML = `
+    const storedSession =
+        localStorage.getItem(
+            "lendlySession"
+        );
 
-        <div
-            style="
-                padding: 80px;
-                text-align: center;
-            "
-        >
+    if (!storedSession) {
 
-            <h2>
-                Loan not found
-            </h2>
+        return null;
 
-            <p>
-                This loan may have been removed
-                or collected.
-            </p>
+    }
 
-            <br>
+    try {
 
-            <a href="loans.html">
-                Back to Loans
-            </a>
+        const session =
+            JSON.parse(
+                storedSession
+            );
 
-        </div>
+        return (
+            session.access_token ||
+            null
+        );
 
-    `;
+    } catch (error) {
 
-} else {
+        console.error(
+            "Unable to read session:",
+            error
+        );
 
-    renderLoanDetails();
+        return null;
+
+    }
 
 }
 
@@ -158,6 +150,17 @@ function getInitials(
 
 function isOverdue() {
 
+    if (
+        !loan ||
+        loan.status === "settled" ||
+        !loan.next_due_date
+    ) {
+
+        return false;
+
+    }
+
+
     const today =
         new Date();
 
@@ -171,12 +174,160 @@ function isOverdue() {
 
     const dueDate =
         new Date(
-            loan.nextDueDate +
+            loan.next_due_date +
             "T00:00:00"
         );
 
 
     return dueDate < today;
+
+}
+
+// ============================================================
+// SHOW NOT FOUND
+// ============================================================
+
+function showNotFound(message) {
+
+    loanDetails.innerHTML = `
+
+        <div
+            style="
+                padding: 80px;
+                text-align: center;
+            "
+        >
+
+            <h2>
+                Loan not found
+            </h2>
+
+            <p>
+                ${
+                    message ||
+                    "This loan may have been removed or collected."
+                }
+            </p>
+
+            <br>
+
+            <a href="/loans">
+                Back to Loans
+            </a>
+
+        </div>
+
+    `;
+
+}
+
+
+// ============================================================
+// LOAD LOAN FROM SERVER
+// ============================================================
+
+async function loadLoan() {
+
+    if (!loanId) {
+
+        showNotFound(
+            "No loan was specified."
+        );
+
+        return;
+
+    }
+
+
+    const accessToken =
+        getAccessToken();
+
+
+    if (!accessToken) {
+
+        window.location.href =
+            "/login";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/loans/${encodeURIComponent(loanId)}`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Load loan error:",
+                result
+            );
+
+
+            if (
+                response.status === 401
+            ) {
+
+                localStorage.removeItem(
+                    "lendlySession"
+                );
+
+                localStorage.removeItem(
+                    "lendlyUser"
+                );
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            showNotFound(
+                result.message
+            );
+
+            return;
+
+        }
+
+
+        loan =
+            result.loan;
+
+
+        renderLoanDetails();
+
+    } catch (error) {
+
+        console.error(
+            "Load loan request failed:",
+            error
+        );
+
+        showNotFound(
+            "Unable to connect to the server."
+        );
+
+    }
 
 }
 
@@ -191,6 +342,22 @@ function renderLoanDetails() {
         isOverdue();
 
 
+    const borrowerName =
+        loan.borrowers
+            ? `${loan.borrowers.first_name} ${loan.borrowers.last_name}`
+            : "Unknown borrower";
+
+
+    const borrowerPhone =
+        loan.borrowers
+            ? loan.borrowers.phone
+            : "";
+
+
+    const settled =
+        loan.status === "settled";
+
+
     loanDetails.innerHTML = `
 
         <!-- HEADER -->
@@ -202,7 +369,7 @@ function renderLoanDetails() {
                 <div class="loan-details-avatar">
 
                     ${getInitials(
-                        loan.borrower
+                        borrowerName
                     )}
 
                 </div>
@@ -211,11 +378,11 @@ function renderLoanDetails() {
                 <div>
 
                     <h2>
-                        ${loan.borrower}
+                        ${borrowerName}
                     </h2>
 
                     <p>
-                        Loan ${loan.id}
+                        ${borrowerPhone}
                     </p>
 
                 </div>
@@ -231,7 +398,9 @@ function renderLoanDetails() {
             >
 
                 ${
-                    overdue
+                    settled
+                    ? "Settled"
+                    : overdue
                     ? "Overdue"
                     : "Active"
                 }
@@ -267,7 +436,7 @@ function renderLoanDetails() {
 
                         <strong>
                             ${formatMoney(
-                                loan.amount
+                                loan.principal_amount
                             )}
                         </strong>
 
@@ -282,7 +451,7 @@ function renderLoanDetails() {
 
                         <strong>
                             ${formatMoney(
-                                loan.remaining
+                                loan.remaining_amount
                             )}
                         </strong>
 
@@ -297,7 +466,7 @@ function renderLoanDetails() {
 
                         <strong>
                             ${formatMoney(
-                                loan.monthlyPayment
+                                loan.monthly_payment
                             )}
                         </strong>
 
@@ -311,7 +480,7 @@ function renderLoanDetails() {
                         </span>
 
                         <strong>
-                            ${loan.interestRate}%
+                            ${loan.interest_rate}%
                         </strong>
 
                     </div>
@@ -324,20 +493,7 @@ function renderLoanDetails() {
                         </span>
 
                         <strong>
-                            ${loan.term} months
-                        </strong>
-
-                    </div>
-
-
-                    <div class="loan-detail-field">
-
-                        <span>
-                            Loan Purpose
-                        </span>
-
-                        <strong>
-                            ${loan.purpose}
+                            ${loan.duration_months} months
                         </strong>
 
                     </div>
@@ -368,7 +524,7 @@ function renderLoanDetails() {
 
                         <strong>
                             ${formatDate(
-                                loan.startDate
+                                loan.start_date
                             )}
                         </strong>
 
@@ -382,9 +538,13 @@ function renderLoanDetails() {
                         </span>
 
                         <strong>
-                            ${formatDate(
-                                loan.nextDueDate
-                            )}
+                            ${
+                                loan.next_due_date
+                                ? formatDate(
+                                    loan.next_due_date
+                                )
+                                : "—"
+                            }
                         </strong>
 
                     </div>
@@ -397,163 +557,12 @@ function renderLoanDetails() {
                         </span>
 
                         <strong>
-                            ${loan.phone}
+                            ${borrowerPhone}
                         </strong>
 
                     </div>
 
                 </div>
-
-            </div>
-
-
-
-            <!-- EDIT FORM -->
-
-            <div
-                class="
-                    loan-edit-form
-                    ${shouldEdit ? "visible" : ""}
-                "
-                id="loanEditForm"
-            >
-
-                <h3>
-                    Edit Loan
-                </h3>
-
-
-                <div class="loan-edit-grid">
-
-
-                    <div class="loan-edit-field">
-
-                        <label>
-                            Borrower Name
-                        </label>
-
-                        <input
-                            type="text"
-                            id="editBorrower"
-                            value="${loan.borrower}"
-                        >
-
-                    </div>
-
-
-                    <div class="loan-edit-field">
-
-                        <label>
-                            Phone
-                        </label>
-
-                        <input
-                            type="text"
-                            id="editPhone"
-                            value="${loan.phone}"
-                        >
-
-                    </div>
-
-
-                    <div class="loan-edit-field">
-
-                        <label>
-                            Loan Amount
-                        </label>
-
-                        <input
-                            type="number"
-                            id="editAmount"
-                            value="${loan.amount}"
-                        >
-
-                    </div>
-
-
-                    <div class="loan-edit-field">
-
-                        <label>
-                            Remaining Balance
-                        </label>
-
-                        <input
-                            type="number"
-                            id="editRemaining"
-                            value="${loan.remaining}"
-                        >
-
-                    </div>
-
-
-                    <div class="loan-edit-field">
-
-                        <label>
-                            Monthly Payment
-                        </label>
-
-                        <input
-                            type="number"
-                            id="editMonthlyPayment"
-                            value="${loan.monthlyPayment}"
-                        >
-
-                    </div>
-
-
-                    <div class="loan-edit-field">
-
-                        <label>
-                            Next Due Date
-                        </label>
-
-                        <input
-                            type="date"
-                            id="editNextDueDate"
-                            value="${loan.nextDueDate}"
-                        >
-
-                    </div>
-
-
-                    <div class="loan-edit-field">
-
-                        <label>
-                            Interest Rate
-                        </label>
-
-                        <input
-                            type="number"
-                            id="editInterestRate"
-                            value="${loan.interestRate}"
-                        >
-
-                    </div>
-
-
-                    <div class="loan-edit-field">
-
-                        <label>
-                            Purpose
-                        </label>
-
-                        <input
-                            type="text"
-                            id="editPurpose"
-                            value="${loan.purpose}"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <button
-                    class="save-loan-button"
-                    id="saveLoanButton"
-                >
-                    Save Changes
-                </button>
 
             </div>
 
@@ -568,19 +577,12 @@ function renderLoanDetails() {
 
 
             <button
-                class="loan-details-action"
-                id="editLoanButton"
-            >
-                Edit Loan
-            </button>
-
-
-            <button
                 class="
                     loan-details-action
                     payment
                 "
                 id="paymentButton"
+                ${settled ? "disabled" : ""}
             >
                 Monthly Payment
             </button>
@@ -592,6 +594,7 @@ function renderLoanDetails() {
                     clear
                 "
                 id="clearLoanButton"
+                ${settled ? "disabled" : ""}
             >
                 Clear Loan
             </button>
@@ -613,12 +616,6 @@ function renderLoanDetails() {
 
 function attachButtons() {
 
-    const editButton =
-        document.getElementById(
-            "editLoanButton"
-        );
-
-
     const paymentButton =
         document.getElementById(
             "paymentButton"
@@ -631,46 +628,18 @@ function attachButtons() {
         );
 
 
-    const saveButton =
-        document.getElementById(
-            "saveLoanButton"
-        );
-
-
-    // -----------------------------------------
-    // EDIT
-    // -----------------------------------------
-
-    editButton.addEventListener(
-        "click",
-        function() {
-
-            const form =
-                document.getElementById(
-                    "loanEditForm"
-                );
-
-
-            form.classList.toggle(
-                "visible"
-            );
-
-        }
-    );
-
-
     // -----------------------------------------
     // MONTHLY PAYMENT
     // -----------------------------------------
 
     paymentButton.addEventListener(
         "click",
-        function() {
+        async function() {
 
             const confirmed =
                 confirm(
                     `Record the monthly payment of ${formatMoney(
-                        loan.monthlyPayment
+                        loan.monthly_payment
                     )}?`
                 );
 
@@ -680,21 +649,80 @@ function attachButtons() {
             }
 
 
-            loan.remaining =
-                Math.max(
-                    0,
-                    loan.remaining -
-                    loan.monthlyPayment
+            const accessToken =
+                getAccessToken();
+
+
+            if (!accessToken) {
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            paymentButton.disabled =
+                true;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `/api/loans/${encodeURIComponent(loanId)}/payment`,
+                        {
+                            method: "PATCH",
+
+                            headers: {
+                                Authorization:
+                                    `Bearer ${accessToken}`
+                            }
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    alert(
+                        result.message ||
+                        "Unable to record payment."
+                    );
+
+                    paymentButton.disabled =
+                        false;
+
+                    return;
+
+                }
+
+
+                loan =
+                    result.loan;
+
+
+                renderLoanDetails();
+
+            } catch (error) {
+
+                console.error(
+                    "Record payment request failed:",
+                    error
                 );
 
+                alert(
+                    "Unable to connect to the server."
+                );
 
-            movePaymentToNextMonth();
+                paymentButton.disabled =
+                    false;
 
-
-            saveLoans();
-
-
-            renderLoanDetails();
+            }
 
         }
     );
@@ -706,11 +734,13 @@ function attachButtons() {
 
     clearButton.addEventListener(
         "click",
-        function() {
+        async function() {
 
             const confirmed =
                 confirm(
-                    "Mark this loan as fully paid and collected?"
+                    `Clear this loan by recording the remaining balance of ${formatMoney(
+                        loan.remaining_amount
+                    )} as the final payment?`
                 );
 
 
@@ -719,103 +749,77 @@ function attachButtons() {
             }
 
 
-            loan.status =
-                "collected";
+            const accessToken =
+                getAccessToken();
 
 
-            loan.remaining =
-                0;
+            if (!accessToken) {
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
 
 
-            loan.clearedDate =
-                new Date()
-                    .toISOString()
-                    .split("T")[0];
+            clearButton.disabled =
+                true;
 
 
-            saveLoans();
+            try {
+
+                const response =
+                    await fetch(
+                        `/api/loans/${encodeURIComponent(loanId)}/clear`,
+                        {
+                            method: "PATCH",
+
+                            headers: {
+                                Authorization:
+                                    `Bearer ${accessToken}`
+                            }
+                        }
+                    );
 
 
-            window.location.href =
-                "loans.html";
-
-        }
-    );
+                const result =
+                    await response.json();
 
 
-    // -----------------------------------------
-    // SAVE CHANGES
-    // -----------------------------------------
+                if (!response.ok) {
 
-    saveButton.addEventListener(
-        "click",
-        function() {
+                    alert(
+                        result.message ||
+                        "Unable to clear loan."
+                    );
 
-            loan.borrower =
-                document.getElementById(
-                    "editBorrower"
-                ).value;
+                    clearButton.disabled =
+                        false;
 
+                    return;
 
-            loan.phone =
-                document.getElementById(
-                    "editPhone"
-                ).value;
+                }
 
 
-            loan.amount =
-                Number(
-                    document.getElementById(
-                        "editAmount"
-                    ).value
+                window.location.href =
+                    "/loans";
+
+            } catch (error) {
+
+                console.error(
+                    "Clear loan request failed:",
+                    error
                 );
 
-
-            loan.remaining =
-                Number(
-                    document.getElementById(
-                        "editRemaining"
-                    ).value
+                alert(
+                    "Unable to connect to the server."
                 );
 
+                clearButton.disabled =
+                    false;
 
-            loan.monthlyPayment =
-                Number(
-                    document.getElementById(
-                        "editMonthlyPayment"
-                    ).value
-                );
-
-
-            loan.nextDueDate =
-                document.getElementById(
-                    "editNextDueDate"
-                ).value;
-
-
-            loan.interestRate =
-                Number(
-                    document.getElementById(
-                        "editInterestRate"
-                    ).value
-                );
-
-
-            loan.purpose =
-                document.getElementById(
-                    "editPurpose"
-                ).value;
-
-
-            saveLoans();
-
-
-            alert(
-                "Loan details updated successfully."
-            );
-
-
-            renderLoanDetails();
+            }
 
         }
     );
@@ -823,69 +827,11 @@ function attachButtons() {
 }
 
 
-// ============================================================
-// MOVE PAYMENT TO NEXT MONTH
-// ============================================================
 
-function movePaymentToNextMonth() {
-
-    const currentDate =
-        new Date(
-            loan.nextDueDate +
-            "T00:00:00"
-        );
-
-
-    const originalDay =
-        currentDate.getDate();
-
-
-    currentDate.setMonth(
-        currentDate.getMonth() + 1
-    );
-
-
-    if (
-        currentDate.getDate() !==
-        originalDay
-    ) {
-
-        currentDate.setDate(0);
-
-    }
-
-
-    const year =
-        currentDate.getFullYear();
-
-
-    const month =
-        String(
-            currentDate.getMonth() + 1
-        ).padStart(2, "0");
-
-
-    const day =
-        String(
-            currentDate.getDate()
-        ).padStart(2, "0");
-
-
-    loan.nextDueDate =
-        `${year}-${month}-${day}`;
-
-}
 
 
 // ============================================================
-// SAVE
+// INITIAL LOAD
 // ============================================================
 
-function saveLoans() {
-
-    localStorage.setItem(
-        "lendlyLoans",
-        JSON.stringify(loans)
-    );
-
-}
+loadLoan();

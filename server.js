@@ -231,7 +231,6 @@ app.post('/api/login', async (req, res) => {
 // =============================
 //  BORROWERS PAGE
 // =============================
-// Borrowers page
 app.get('/borrowers', (req, res) => {
     res.sendFile(
         path.join(
@@ -1726,9 +1725,750 @@ app.get('/api/loans', async (req, res) => {
 
 });
 
+// =============================
+// // LOANS PAGE
+// =============================
+app.get('/loans', (req, res) => {
+    res.sendFile(
+        path.join(
+            __dirname,
+            'src',
+            'public',
+            'html',
+            'loans.html'
+        )
+    );
+});
 
 
+// =============================
+// GET ALL ACTIVE LOANS (loans dashboard)
+// =============================
 
+app.get('/api/loans/active', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET ACTIVE LOANS WITH BORROWER INFO
+        // ==========================================
+
+        /*
+            RLS restricts this to loans belonging
+            to the authenticated lender.
+
+            We join borrowers so we can show the
+            borrower's name and phone number without
+            a second round trip per loan.
+        */
+
+        const {
+            data: loans,
+            error: loansError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .select(`
+                    id,
+                    principal_amount,
+                    remaining_amount,
+                    monthly_payment,
+                    next_due_date,
+                    start_date,
+                    duration_months,
+                    interest_rate,
+                    status,
+                    borrower_id,
+                    borrowers (
+                        first_name,
+                        last_name,
+                        phone
+                    )
+                `)
+                .eq('status', 'active')
+                .order('next_due_date', {
+                    ascending: true
+                });
+
+
+        if (loansError) {
+
+            console.error(
+                'Active loans fetch error:',
+                loansError
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to load loans.'
+            });
+
+        }
+
+
+        // ==========================================
+        // SUCCESS
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            loans:
+                loans || []
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            'Get active loans error:',
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while loading loans.'
+        });
+
+    }
+
+});
+
+
+// =============================
+// // LOAN DETAILS PAGE
+// =============================
+app.get('/loans/details', (req, res) => {
+    res.sendFile(
+        path.join(
+            __dirname,
+            'src',
+            'public',
+            'html',
+            'loan-details.html'
+        )
+    );
+});
+
+// =============================
+// GET SINGLE LOAN (with borrower)
+// =============================
+
+app.get('/api/loans/:id', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET LOAN
+        // ==========================================
+
+        const loanId =
+            req.params.id;
+
+
+        const {
+            data: loan,
+            error: loanError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .select(`
+                    id,
+                    principal_amount,
+                    remaining_amount,
+                    monthly_payment,
+                    interest_rate,
+                    duration_months,
+                    status,
+                    start_date,
+                    next_due_date,
+                    borrower_id,
+                    borrowers (
+                        first_name,
+                        last_name,
+                        phone
+                    )
+                `)
+                .eq('id', loanId)
+                .single();
+
+
+        if (
+            loanError ||
+            !loan
+        ) {
+
+            console.error(
+                'Loan lookup error:',
+                loanError
+            );
+
+            return res.status(404).json({
+                success: false,
+                message:
+                    'Loan not found.'
+            });
+
+        }
+
+
+        // ==========================================
+        // SUCCESS
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            loan
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            'Get loan error:',
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while loading the loan.'
+        });
+
+    }
+
+});
+
+
+// =============================
+// RECORD MONTHLY PAYMENT
+// =============================
+
+app.patch('/api/loans/:id/payment', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // CALL DATABASE FUNCTION
+        // ==========================================
+
+        const loanId =
+            req.params.id;
+
+
+        const {
+            data,
+            error
+        } =
+            await authenticatedSupabase
+                .rpc(
+                    'record_loan_payment',
+                    {
+                        p_loan_id:
+                            loanId
+                    }
+                );
+
+
+        if (error) {
+
+            console.error(
+                'Record payment RPC error:',
+                error
+            );
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    error.message ||
+                    'Unable to record payment.'
+            });
+
+        }
+
+
+        // ==========================================
+        // RESPONSE
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            message:
+                data.loan.status === 'settled'
+                    ? 'Final payment recorded. Loan settled successfully.'
+                    : 'Monthly payment recorded successfully.',
+
+            loan:
+                data.loan,
+
+            installment:
+                data.installment
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            'Record payment error:',
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while recording the payment.'
+        });
+
+    }
+
+});
+
+
+// =============================
+// CLEAR LOAN
+// =============================
+
+app.patch('/api/loans/:id/clear', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // CALL DATABASE FUNCTION
+        // ==========================================
+
+        const loanId =
+            req.params.id;
+
+
+        const {
+            data,
+            error
+        } =
+            await authenticatedSupabase
+                .rpc(
+                    'clear_loan',
+                    {
+                        p_loan_id:
+                            loanId
+                    }
+                );
+
+
+        if (error) {
+
+            console.error(
+                'Clear loan RPC error:',
+                error
+            );
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    error.message ||
+                    'Unable to clear loan.'
+            });
+
+        }
+
+
+        // ==========================================
+        // RESPONSE
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            message:
+                'Loan cleared successfully.',
+
+            loan:
+                data.loan,
+
+            installment:
+                data.installment
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            'Clear loan error:',
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while clearing the loan.'
+        });
+
+    }
+
+});
 
 // =============================
 // START SERVER
