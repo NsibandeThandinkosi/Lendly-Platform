@@ -463,6 +463,106 @@
 }
 
 
+
+/* ============================================================
+   SECTION
+============================================================ */
+
+.borrower-section {
+
+    padding: 25px;
+
+    margin-bottom: 15px;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+}
+
+
+.section-title {
+
+    padding-bottom: 15px;
+
+    margin-bottom: 15px;
+
+    border-bottom: 1px solid var(--border);
+
+}
+
+
+.section-title h3 {
+
+    color: var(--navy);
+
+    font-size: 13px;
+
+    margin-bottom: 4px;
+
+}
+
+
+.section-title p {
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+/* ============================================================
+   PERSONAL DETAILS
+============================================================ */
+
+.borrower-info-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 12px;
+
+}
+
+
+.borrower-info-grid > div {
+
+    padding: 14px;
+
+    border-radius: 8px;
+
+    background: #f8fafc;
+
+}
+
+
+.borrower-info-grid span {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 8px;
+
+}
+
+
+.borrower-info-grid strong {
+
+    color: var(--navy);
+
+    font-size: 10px;
+
+}
+
+
 /* ============================================================
    RESPONSIVE
 ============================================================ */

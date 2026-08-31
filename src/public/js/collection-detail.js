@@ -3,191 +3,18 @@
 ============================================================ */
 
 
-/*
-    Hard-coded collection data.
+// ============================================================
+// STATE
+// ============================================================
 
-    This currently mirrors the data from collections.js.
+let loan = null;
 
-    Later, this will come from Supabase.
-*/
+let installments = [];
 
-const collectedLoans = [
 
-    {
-        id: 1,
-
-        loanNumber: "LN-001",
-
-        borrower: {
-
-            id: "BR-001",
-
-            name: "Sipho Dlamini",
-
-            initials: "SD",
-
-            phone: "082 555 1234",
-
-            email: "sipho@example.com"
-
-        },
-
-        originalLoan: 8000,
-
-        totalPaid: 8500,
-
-        startDate: "2026-05-15",
-
-        fulfilledDate: "2026-08-15",
-
-        payments: [
-
-            {
-                description: "Monthly payment",
-                date: "2026-06-15",
-                method: "EFT",
-                amount: 2800
-            },
-
-            {
-                description: "Monthly payment",
-                date: "2026-07-15",
-                method: "EFT",
-                amount: 2800
-            },
-
-            {
-                description: "Final payment",
-                date: "2026-08-15",
-                method: "EFT",
-                amount: 2900
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 2,
-
-        loanNumber: "LN-002",
-
-        borrower: {
-
-            id: "BR-002",
-
-            name: "Lerato Mokoena",
-
-            initials: "LM",
-
-            phone: "071 234 5678",
-
-            email: "lerato@example.com"
-
-        },
-
-        originalLoan: 12000,
-
-        totalPaid: 12500,
-
-        startDate: "2026-04-10",
-
-        fulfilledDate: "2026-08-10",
-
-        payments: [
-
-            {
-                description: "Monthly payment",
-                date: "2026-05-10",
-                method: "Cash",
-                amount: 3000
-            },
-
-            {
-                description: "Monthly payment",
-                date: "2026-06-10",
-                method: "Cash",
-                amount: 3000
-            },
-
-            {
-                description: "Monthly payment",
-                date: "2026-07-10",
-                method: "EFT",
-                amount: 3000
-            },
-
-            {
-                description: "Final payment",
-                date: "2026-08-10",
-                method: "EFT",
-                amount: 3500
-            }
-
-        ]
-
-    },
-
-
-    {
-        id: 3,
-
-        loanNumber: "LN-003",
-
-        borrower: {
-
-            id: "BR-003",
-
-            name: "Thabo Nkosi",
-
-            initials: "TN",
-
-            phone: "079 876 5432",
-
-            email: "thabo@example.com"
-
-        },
-
-        originalLoan: 6000,
-
-        totalPaid: 6500,
-
-        startDate: "2026-05-28",
-
-        fulfilledDate: "2026-07-28",
-
-        payments: [
-
-            {
-                description: "Monthly payment",
-                date: "2026-06-28",
-                method: "EFT",
-                amount: 3000
-            },
-
-            {
-                description: "Final payment",
-                date: "2026-07-28",
-                method: "EFT",
-                amount: 3500
-            }
-
-        ]
-
-    }
-
-];
-
-const notificationButton =
-    document.getElementById("notificationButton");
-
-const profileButton =
-    document.getElementById("profileButton");
-
-/* ============================================================
-   GET LOAN ID
-============================================================ */
+// ============================================================
+// GET LOAN ID FROM URL
+// ============================================================
 
 const params =
     new URLSearchParams(
@@ -196,26 +23,69 @@ const params =
 
 
 const loanId =
-    Number(
-        params.get("id")
-    );
+    params.get("id");
 
 
+// ============================================================
+// ELEMENTS
+// ============================================================
 
-/* ============================================================
-   FIND LOAN
-============================================================ */
+const notificationButton =
+    document.getElementById("notificationButton");
 
-const loan =
-    collectedLoans.find(
-        loan => loan.id === loanId
-    );
+const profileButton =
+    document.getElementById("profileButton");
+
+const deleteRecordButton =
+    document.getElementById("deleteRecordButton");
 
 
+// ============================================================
+// AUTHENTICATION
+// ============================================================
 
-/* ============================================================
-   FORMAT CURRENCY
-============================================================ */
+function getAccessToken() {
+
+    const storedSession =
+        localStorage.getItem(
+            "lendlySession"
+        );
+
+    if (!storedSession) {
+
+        return null;
+
+    }
+
+    try {
+
+        const session =
+            JSON.parse(
+                storedSession
+            );
+
+        return (
+            session.access_token ||
+            null
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Unable to read session:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+// ============================================================
+// FORMAT CURRENCY
+// ============================================================
 
 function formatCurrency(amount) {
 
@@ -226,19 +96,33 @@ function formatCurrency(amount) {
             currency: "ZAR",
             maximumFractionDigits: 0
         }
-    ).format(amount);
+    ).format(
+        Number(amount || 0)
+    );
 
 }
 
 
+// ============================================================
+// FORMAT DATE
+// ============================================================
 
-/* ============================================================
-   FORMAT DATE
-============================================================ */
+function formatDate(dateString) {
 
-function formatDate(date) {
+    if (!dateString) {
 
-    return new Date(date).toLocaleDateString(
+        return "--";
+
+    }
+
+
+    const date =
+        new Date(
+            dateString + "T00:00:00"
+        );
+
+
+    return date.toLocaleDateString(
         "en-ZA",
         {
             day: "numeric",
@@ -250,31 +134,171 @@ function formatDate(date) {
 }
 
 
+// ============================================================
+// GET INITIALS
+// ============================================================
 
-/* ============================================================
-   DISPLAY LOAN
-============================================================ */
+function getInitials(name) {
 
-function displayLoan() {
+    return name
+        .split(" ")
+        .filter(
+            word => word.length > 0
+        )
+        .map(
+            word => word[0]
+        )
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
 
-    /*
-        If the ID doesn't exist,
-        send the user back.
-    */
+}
 
-    if (!loan) {
+
+// ============================================================
+// LOAD COLLECTION FROM SERVER
+// ============================================================
+
+async function loadCollection() {
+
+    if (!loanId) {
 
         alert(
-            "The collection record could not be found."
+            "No collection was specified."
         );
 
         window.location.href =
-            "collections.html";
+            "/collections";
 
         return;
 
     }
 
+
+    const accessToken =
+        getAccessToken();
+
+
+    if (!accessToken) {
+
+        window.location.href =
+            "/login";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/collections/${encodeURIComponent(loanId)}`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Load collection error:",
+                result
+            );
+
+
+            if (
+                response.status === 401
+            ) {
+
+                localStorage.removeItem(
+                    "lendlySession"
+                );
+
+                localStorage.removeItem(
+                    "lendlyUser"
+                );
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            alert(
+                result.message ||
+                "The collection record could not be found."
+            );
+
+            window.location.href =
+                "/collections";
+
+            return;
+
+        }
+
+
+        loan =
+            result.loan;
+
+
+        installments =
+            result.installments || [];
+
+
+        displayLoan();
+
+    } catch (error) {
+
+        console.error(
+            "Load collection request failed:",
+            error
+        );
+
+        alert(
+            "Unable to connect to the server."
+        );
+
+        window.location.href =
+            "/collections";
+
+    }
+
+}
+
+
+// ============================================================
+// DISPLAY LOAN
+// ============================================================
+
+function displayLoan() {
+
+    const borrower =
+        loan.borrowers;
+
+
+    const borrowerName =
+        borrower
+            ? `${borrower.first_name} ${borrower.last_name}`
+            : "Unknown borrower";
+
+
+    const borrowerPhone =
+        borrower
+            ? borrower.phone
+            : "--";
 
 
     /* ========================================================
@@ -284,19 +308,15 @@ function displayLoan() {
     document.getElementById(
         "borrowerAvatar"
     ).textContent =
-        loan.borrower.initials;
+        getInitials(
+            borrowerName
+        );
 
 
     document.getElementById(
         "borrowerName"
     ).textContent =
-        loan.borrower.name;
-
-
-    document.getElementById(
-        "loanNumber"
-    ).textContent =
-        `Loan #${loan.loanNumber}`;
+        borrowerName;
 
 
 
@@ -308,7 +328,7 @@ function displayLoan() {
         "originalLoan"
     ).textContent =
         formatCurrency(
-            loan.originalLoan
+            loan.principal_amount
         );
 
 
@@ -316,7 +336,7 @@ function displayLoan() {
         "totalPaid"
     ).textContent =
         formatCurrency(
-            loan.totalPaid
+            loan.total_repayment
         );
 
 
@@ -324,7 +344,7 @@ function displayLoan() {
         "startDate"
     ).textContent =
         formatDate(
-            loan.startDate
+            loan.start_date
         );
 
 
@@ -332,37 +352,35 @@ function displayLoan() {
         "fulfilledDate"
     ).textContent =
         formatDate(
-            loan.fulfilledDate
+            loan.settlement_date
         );
 
 
 
     /* ========================================================
-       BORROWER INFORMATION
+       PERSONAL DETAILS
     ======================================================== */
 
     document.getElementById(
-        "detailBorrowerName"
+        "firstName"
     ).textContent =
-        loan.borrower.name;
+        borrower
+            ? borrower.first_name
+            : "--";
 
 
     document.getElementById(
-        "borrowerPhone"
+        "lastName"
     ).textContent =
-        loan.borrower.phone;
+        borrower
+            ? borrower.last_name
+            : "--";
 
 
     document.getElementById(
-        "borrowerEmail"
+        "phone"
     ).textContent =
-        loan.borrower.email;
-
-
-    document.getElementById(
-        "borrowerId"
-    ).textContent =
-        loan.borrower.id;
+        borrowerPhone;
 
 
 
@@ -374,7 +392,7 @@ function displayLoan() {
         "paymentTotal"
     ).textContent =
         formatCurrency(
-            loan.totalPaid
+            loan.total_repayment
         );
 
 
@@ -388,10 +406,9 @@ function displayLoan() {
 }
 
 
-
-/* ============================================================
-   DISPLAY PAYMENTS
-============================================================ */
+// ============================================================
+// DISPLAY PAYMENTS
+// ============================================================
 
 function displayPayments() {
 
@@ -404,8 +421,27 @@ function displayPayments() {
     paymentHistory.innerHTML = "";
 
 
-    loan.payments.forEach(
-        payment => {
+    if (installments.length === 0) {
+
+        paymentHistory.innerHTML = `
+
+            <tr>
+
+                <td colspan="3">
+                    No payments recorded for this loan.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    installments.forEach(
+        installment => {
 
             const row =
                 document.createElement("tr");
@@ -414,19 +450,15 @@ function displayPayments() {
             row.innerHTML = `
 
                 <td>
-                    ${payment.description}
+                    Installment #${installment.installment_number}
                 </td>
 
                 <td>
-                    ${formatDate(payment.date)}
-                </td>
-
-                <td>
-                    ${payment.method}
+                    ${formatDate(installment.paid_date)}
                 </td>
 
                 <td class="payment-amount">
-                    ${formatCurrency(payment.amount)}
+                    ${formatCurrency(installment.amount_paid)}
                 </td>
 
             `;
@@ -440,22 +472,29 @@ function displayPayments() {
 }
 
 
+// ============================================================
+// DELETE RECORD
+// ============================================================
 
-/* ============================================================
-   DELETE RECORD
-============================================================ */
+if (deleteRecordButton) {
 
-document
-    .getElementById(
-        "deleteRecordButton"
-    )
-    .addEventListener(
+    deleteRecordButton.addEventListener(
         "click",
-        () => {
+        async () => {
+
+            const borrower =
+                loan.borrowers;
+
+
+            const borrowerName =
+                borrower
+                    ? `${borrower.first_name} ${borrower.last_name}`
+                    : "this borrower";
+
 
             const confirmed =
                 confirm(
-                    `Delete the collection record for ${loan.borrower.name}?`
+                    `Delete the collection record for ${borrowerName}?`
                 );
 
 
@@ -464,28 +503,124 @@ document
             }
 
 
-            /*
-                For now this only returns the
-                user to the collections page.
-
-                Later this will delete the record
-                from Supabase.
-            */
-
-            alert(
-                "Collection record deleted."
-            );
+            const accessToken =
+                getAccessToken();
 
 
-            window.location.href =
-                "collections.html";
+            if (!accessToken) {
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            deleteRecordButton.disabled =
+                true;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `/api/collections/${encodeURIComponent(loanId)}`,
+                        {
+                            method: "DELETE",
+
+                            headers: {
+                                Authorization:
+                                    `Bearer ${accessToken}`
+                            }
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    alert(
+                        result.message ||
+                        "Unable to delete collection."
+                    );
+
+                    deleteRecordButton.disabled =
+                        false;
+
+                    return;
+
+                }
+
+
+                window.location.href =
+                    "/collections";
+
+            } catch (error) {
+
+                console.error(
+                    "Delete collection request failed:",
+                    error
+                );
+
+                alert(
+                    "Unable to connect to the server."
+                );
+
+                deleteRecordButton.disabled =
+                    false;
+
+            }
 
         }
     );
 
-    
-/* ============================================================
-   INITIALIZE
-============================================================ */
+}
 
-displayLoan();
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+
+if (notificationButton) {
+
+    notificationButton.addEventListener(
+        "click",
+        function() {
+
+            window.location.href =
+                "/notifications";
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// USER PROFILE
+// ============================================================
+
+if (profileButton) {
+
+    profileButton.addEventListener(
+        "click",
+        function() {
+
+            window.location.href =
+                "/profile";
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// INITIALIZE
+// ============================================================
+
+loadCollection();

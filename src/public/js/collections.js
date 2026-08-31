@@ -3,100 +3,25 @@
 ============================================================ */
 
 
-/*
-    Hard-coded fulfilled loans for now.
+// ============================================================
+// STATE
+// ============================================================
 
-    Later this array can be replaced with
-    data retrieved from Supabase.
-*/
-
-const collectedLoans = [
-
-    {
-        id: 1,
-
-        borrower: {
-            name: "Sipho Dlamini",
-            initials: "SD",
-            phone: "082 555 1234"
-        },
-
-        totalPaid: 8500,
-
-        fulfilledDate: "2026-08-15",
-
-        originalLoan: 8000
-    },
+let collectedLoans = [];
 
 
-    {
-        id: 2,
+// ============================================================
+// ELEMENTS
+// ============================================================
 
-        borrower: {
-            name: "Lerato Mokoena",
-            initials: "LM",
-            phone: "071 234 5678"
-        },
+const collectionsList =
+    document.getElementById("collectionsList");
 
-        totalPaid: 12500,
+const totalCollected =
+    document.getElementById("totalCollected");
 
-        fulfilledDate: "2026-08-10",
-
-        originalLoan: 12000
-    },
-
-
-    {
-        id: 3,
-
-        borrower: {
-            name: "Thabo Nkosi",
-            initials: "TN",
-            phone: "079 876 5432"
-        },
-
-        totalPaid: 6500,
-
-        fulfilledDate: "2026-07-28",
-
-        originalLoan: 6000
-    },
-
-
-    {
-        id: 4,
-
-        borrower: {
-            name: "Nomsa Zulu",
-            initials: "NZ",
-            phone: "083 456 7890"
-        },
-
-        totalPaid: 15000,
-
-        fulfilledDate: "2026-07-18",
-
-        originalLoan: 14000
-    },
-
-
-    {
-        id: 5,
-
-        borrower: {
-            name: "Kagiso Molefe",
-            initials: "KM",
-            phone: "076 321 9876"
-        },
-
-        totalPaid: 9200,
-
-        fulfilledDate: "2026-06-30",
-
-        originalLoan: 9000
-    }
-
-];
+const totalLoans =
+    document.getElementById("totalLoans");
 
 const notificationButton =
     document.getElementById("notificationButton");
@@ -105,26 +30,223 @@ const profileButton =
     document.getElementById("profileButton");
 
 
+// ============================================================
+// AUTHENTICATION
+// ============================================================
 
-/* ============================================================
-   SORT COLLECTIONS
-============================================================ */
+function getAccessToken() {
 
-/*
-    Most recent fulfilled loan first.
-*/
-
-collectedLoans.sort(
-    (a, b) =>
-        new Date(b.fulfilledDate) -
-        new Date(a.fulfilledDate)
-);
+    const storedSession =
+        localStorage.getItem("lendlySession");
 
 
+    if (!storedSession) {
 
-/* ============================================================
-   FORMAT CURRENCY
-============================================================ */
+        return null;
+
+    }
+
+
+    try {
+
+        const session =
+            JSON.parse(storedSession);
+
+
+        return (
+            session.access_token ||
+            null
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Unable to read session:",
+            error
+        );
+
+
+        return null;
+
+    }
+
+}
+
+
+// ============================================================
+// LOAD COLLECTIONS FROM SERVER
+// ============================================================
+
+async function loadCollections() {
+
+    const accessToken =
+        getAccessToken();
+
+
+    // ==========================================
+    // CHECK AUTHENTICATION
+    // ==========================================
+
+    if (!accessToken) {
+
+        window.location.href =
+            "/login";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/collections",
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        // ==========================================
+        // HANDLE SERVER ERRORS
+        // ==========================================
+
+        if (!response.ok) {
+
+            console.error(
+                "Load collections error:",
+                result
+            );
+
+
+            // --------------------------------------
+            // SESSION EXPIRED / INVALID
+            // --------------------------------------
+
+            if (
+                response.status === 401
+            ) {
+
+                localStorage.removeItem(
+                    "lendlySession"
+                );
+
+                localStorage.removeItem(
+                    "lendlyUser"
+                );
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            collectionsList.innerHTML = `
+
+                <div class="collections-empty">
+
+                    <h3>
+                        Unable to load collections
+                    </h3>
+
+                    <p>
+                        ${
+                            result.message ||
+                            "Unable to load collections."
+                        }
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // STORE SERVER DATA
+        // ==========================================
+
+        collectedLoans =
+            result.collections || [];
+
+
+        // ==========================================
+        // SORT COLLECTIONS
+        //
+        // Most recently settled first
+        // ==========================================
+
+        collectedLoans.sort(
+            function(a, b) {
+
+                return (
+                    new Date(
+                        b.fulfilledDate
+                    ) -
+                    new Date(
+                        a.fulfilledDate
+                    )
+                );
+
+            }
+        );
+
+
+        // ==========================================
+        // DISPLAY
+        // ==========================================
+
+        displayCollections();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Load collections request failed:",
+            error
+        );
+
+
+        collectionsList.innerHTML = `
+
+            <div class="collections-empty">
+
+                <h3>
+                    Unable to connect to the server
+                </h3>
+
+                <p>
+                    Please try again later.
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+// ============================================================
+// FORMAT CURRENCY
+// ============================================================
 
 function formatCurrency(amount) {
 
@@ -135,19 +257,33 @@ function formatCurrency(amount) {
             currency: "ZAR",
             maximumFractionDigits: 0
         }
-    ).format(amount);
+    ).format(
+        Number(amount || 0)
+    );
 
 }
 
 
+// ============================================================
+// FORMAT DATE
+// ============================================================
 
-/* ============================================================
-   FORMAT DATE
-============================================================ */
+function formatDate(dateString) {
 
-function formatDate(date) {
+    if (!dateString) {
 
-    return new Date(date).toLocaleDateString(
+        return "-";
+
+    }
+
+
+    const date =
+        new Date(
+            dateString + "T00:00:00"
+        );
+
+
+    return date.toLocaleDateString(
         "en-ZA",
         {
             day: "numeric",
@@ -159,35 +295,45 @@ function formatDate(date) {
 }
 
 
+// ============================================================
+// GET BORROWER INITIALS
+// ============================================================
 
-/* ============================================================
-   DISPLAY COLLECTIONS
-============================================================ */
+function getInitials(name) {
+
+    return name
+        .split(" ")
+        .filter(
+            word => word.length > 0
+        )
+        .map(
+            word => word[0]
+        )
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
+
+}
+
+
+// ============================================================
+// DISPLAY COLLECTIONS
+// ============================================================
 
 function displayCollections() {
 
-    const list =
-        document.getElementById(
-            "collectionsList"
-        );
+    collectionsList.innerHTML = "";
 
 
-    /*
-        Clear the current list.
-    */
+    // ==========================================
+    // EMPTY STATE
+    // ==========================================
 
-    list.innerHTML = "";
+    if (
+        collectedLoans.length === 0
+    ) {
 
-
-
-    /*
-        If there are no collected loans,
-        show an empty state.
-    */
-
-    if (collectedLoans.length === 0) {
-
-        list.innerHTML = `
+        collectionsList.innerHTML = `
 
             <div class="collections-empty">
 
@@ -196,12 +342,13 @@ function displayCollections() {
                 </h3>
 
                 <p>
-                    Fulfilled loans will appear here.
+                    Settled loans will appear here.
                 </p>
 
             </div>
 
         `;
+
 
         updateSummary();
 
@@ -210,13 +357,12 @@ function displayCollections() {
     }
 
 
-
-    /*
-        Create each collection record.
-    */
+    // ==========================================
+    // DISPLAY EACH COLLECTION
+    // ==========================================
 
     collectedLoans.forEach(
-        loan => {
+        function(loan) {
 
             const item =
                 document.createElement("div");
@@ -234,7 +380,9 @@ function displayCollections() {
 
                     <div class="collection-borrower-avatar">
 
-                        ${loan.borrower.initials}
+                        ${getInitials(
+                            loan.borrower.name
+                        )}
 
                     </div>
 
@@ -264,7 +412,9 @@ function displayCollections() {
                     </span>
 
                     <strong class="collection-info-value">
-                        ${formatCurrency(loan.totalPaid)}
+                        ${formatCurrency(
+                            loan.totalPaid
+                        )}
                     </strong>
 
                 </div>
@@ -280,7 +430,9 @@ function displayCollections() {
                     </span>
 
                     <strong>
-                        ${formatDate(loan.fulfilledDate)}
+                        ${formatDate(
+                            loan.fulfilledDate
+                        )}
                     </strong>
 
                 </div>
@@ -296,7 +448,8 @@ function displayCollections() {
                             collection-action-button
                             collection-view-button
                         "
-                        onclick="viewCollection(${loan.id})"
+                        data-action="view"
+                        data-id="${loan.id}"
                     >
                         View
                     </button>
@@ -307,7 +460,8 @@ function displayCollections() {
                             collection-action-button
                             collection-delete-button
                         "
-                        onclick="deleteCollection(${loan.id})"
+                        data-action="delete"
+                        data-id="${loan.id}"
                     >
                         Delete
                     </button>
@@ -317,7 +471,9 @@ function displayCollections() {
             `;
 
 
-            list.appendChild(item);
+            collectionsList.appendChild(
+                item
+            );
 
         }
     );
@@ -328,73 +484,151 @@ function displayCollections() {
 }
 
 
-
-/* ============================================================
-   UPDATE SUMMARY
-============================================================ */
+// ============================================================
+// UPDATE SUMMARY
+// ============================================================
 
 function updateSummary() {
 
     const total =
         collectedLoans.reduce(
-            (sum, loan) =>
-                sum + loan.totalPaid,
+            function(sum, loan) {
+
+                return (
+                    sum +
+                    Number(
+                        loan.totalPaid || 0
+                    )
+                );
+
+            },
             0
         );
 
 
-    document.getElementById(
-        "totalCollected"
-    ).textContent =
+    totalCollected.textContent =
         formatCurrency(total);
 
 
-    document.getElementById(
-        "totalLoans"
-    ).textContent =
+    totalLoans.textContent =
         collectedLoans.length;
 
 }
 
 
+// ============================================================
+// COLLECTION BUTTON HANDLER
+// ============================================================
 
-/* ============================================================
-   VIEW COLLECTION
-============================================================ */
+collectionsList.addEventListener(
+    "click",
+    async function(event) {
 
-function viewCollection(id) {
-
-    /*
-        For now we send the ID to the
-        loan details page.
-
-        Later the loan details page can
-        retrieve the matching record from
-        Supabase.
-    */
-
-    window.location.href =
-    `collection-details.html?id=${id}`;
-
-}
+        const button =
+            event.target.closest(
+                ".collection-action-button"
+            );
 
 
-/* ============================================================
-   DELETE COLLECTION
-============================================================ */
+        if (!button) {
 
-function deleteCollection(id) {
+            return;
+
+        }
+
+
+        const collectionId =
+            button.dataset.id;
+
+
+        const action =
+            button.dataset.action;
+
+
+        // ==========================================
+        // VIEW
+        // ==========================================
+
+        if (
+            action === "view"
+        ) {
+
+            window.location.href =
+                `/collections/details?id=${collectionId}`;
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // DELETE
+        // ==========================================
+
+        if (
+            action === "delete"
+        ) {
+
+            await deleteCollection(
+                collectionId
+            );
+
+        }
+
+    }
+);
+
+
+// ============================================================
+// DELETE COLLECTION
+// ============================================================
+
+async function deleteCollection(id) {
+
+    const accessToken =
+        getAccessToken();
+
+
+    // ==========================================
+    // CHECK AUTHENTICATION
+    // ==========================================
+
+    if (!accessToken) {
+
+        window.location.href =
+            "/login";
+
+        return;
+
+    }
+
+
+    // ==========================================
+    // FIND COLLECTION
+    // ==========================================
 
     const loan =
         collectedLoans.find(
-            loan => loan.id === id
+            function(collection) {
+
+                return (
+                    collection.id === id
+                );
+
+            }
         );
 
 
     if (!loan) {
+
         return;
+
     }
 
+
+    // ==========================================
+    // CONFIRM DELETE
+    // ==========================================
 
     const confirmed =
         confirm(
@@ -403,44 +637,116 @@ function deleteCollection(id) {
 
 
     if (!confirmed) {
+
         return;
-    }
-
-
-    /*
-        Remove the record from the
-        hard-coded array.
-    */
-
-    const index =
-        collectedLoans.findIndex(
-            loan => loan.id === id
-        );
-
-
-    if (index !== -1) {
-
-        collectedLoans.splice(
-            index,
-            1
-        );
 
     }
 
 
-    /*
-        Re-render the page.
-    */
+    try {
 
-    displayCollections();
+        const response =
+            await fetch(
+                `/api/collections/${id}`,
+                {
+                    method: "DELETE",
 
-};
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
 
-/* ============================================================
-   INITIALIZE
-============================================================ */
 
-displayCollections();
+        const result =
+            await response.json();
+
+
+        // ==========================================
+        // HANDLE SERVER ERROR
+        // ==========================================
+
+        if (!response.ok) {
+
+            console.error(
+                "Delete collection error:",
+                result
+            );
+
+
+            // --------------------------------------
+            // SESSION EXPIRED / INVALID
+            // --------------------------------------
+
+            if (
+                response.status === 401
+            ) {
+
+                localStorage.removeItem(
+                    "lendlySession"
+                );
+
+                localStorage.removeItem(
+                    "lendlyUser"
+                );
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            alert(
+                result.message ||
+                "Unable to delete collection."
+            );
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // REMOVE FROM LOCAL STATE
+        // ==========================================
+
+        collectedLoans =
+            collectedLoans.filter(
+                function(collection) {
+
+                    return (
+                        collection.id !== id
+                    );
+
+                }
+            );
+
+
+        // ==========================================
+        // UPDATE DISPLAY
+        // ==========================================
+
+        displayCollections();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Delete collection request failed:",
+            error
+        );
+
+
+        alert(
+            "Unable to connect to the server."
+        );
+
+    }
+
+}
 
 
 // ============================================================
@@ -451,7 +757,8 @@ notificationButton.addEventListener(
     "click",
     function() {
 
-        window.location.href = "notifications.html";
+        window.location.href =
+            "notifications.html";
 
     }
 );
@@ -465,7 +772,16 @@ profileButton.addEventListener(
     "click",
     function() {
 
-        window.location.href = "profile.html";
+        window.location.href =
+            "profile.html";
 
     }
 );
+
+
+// ============================================================
+// INITIAL LOAD
+// ============================================================
+
+loadCollections();
+
