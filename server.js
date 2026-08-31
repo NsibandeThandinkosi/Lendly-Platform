@@ -2470,6 +2470,710 @@ app.patch('/api/loans/:id/clear', async (req, res) => {
 
 });
 
+
+
+
+// ============================================================
+// COLLECTIONS
+// ============================================================
+app.get('/collections', (req, res) => {
+    res.sendFile(
+        path.join(
+            __dirname,
+            'src',
+            'public',
+            'html',
+            'collections.html'
+        )
+    );
+});
+
+// ============================================================
+// GET COLLECTIONS
+// ============================================================
+
+app.get('/api/collections', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            console.error(
+                'Collections authentication error:',
+                userError
+            );
+
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET SETTLED LOANS
+        // ==========================================
+
+        /*
+            Only settled loans belong in Collections.
+
+            Valid loan statuses in your database are:
+
+                active
+                overdue
+                settled
+
+            Therefore we only retrieve:
+
+                status = 'settled'
+        */
+
+        const {
+            data: loans,
+            error: loansError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .select(`
+                    id,
+                    lender_id,
+                    borrower_id,
+                    principal_amount,
+                    total_repayment,
+                    settlement_date,
+                    status,
+                    borrowers (
+                        id,
+                        first_name,
+                        last_name,
+                        phone
+                    )
+                `)
+                .eq('status', 'settled')
+                .order(
+                    'settlement_date',
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (loansError) {
+
+            console.error(
+                'Collections database error:',
+                loansError
+            );
+
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to load collections.'
+            });
+
+        }
+
+
+        // ==========================================
+        // FORMAT DATA FOR FRONTEND
+        // ==========================================
+
+        const collections =
+            (loans || []).map(
+                function(loan) {
+
+                    const borrower =
+                        loan.borrowers;
+
+
+                    const firstName =
+                        borrower?.first_name || "";
+
+
+                    const lastName =
+                        borrower?.last_name || "";
+
+
+                    return {
+
+                        id:
+                            loan.id,
+
+                        borrower: {
+
+                            name:
+                                `${firstName} ${lastName}`.trim(),
+
+                            phone:
+                                borrower?.phone || ""
+
+                        },
+
+                        totalPaid:
+                            Number(
+                                loan.total_repayment
+                            ),
+
+                        fulfilledDate:
+                            loan.settlement_date,
+
+                        originalLoan:
+                            Number(
+                                loan.principal_amount
+                            )
+
+                    };
+
+                }
+            );
+
+
+        // ==========================================
+        // RESPONSE
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            collections:
+                collections
+
+        });
+
+    }
+    catch (error) {
+
+        console.error(
+            'Get collections error:',
+            error
+        );
+
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while loading collections.'
+        });
+
+    }
+
+});
+
+
+
+// ============================================================
+// DELETE COLLECTION
+// ============================================================
+
+app.delete('/api/collections/:id', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET COLLECTION ID
+        // ==========================================
+
+        const collectionId =
+            req.params.id;
+
+
+        if (!collectionId) {
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    'Collection ID is required.'
+            });
+
+        }
+
+
+        // ==========================================
+        // DELETE SETTLED LOAN
+        // ==========================================
+
+        const {
+            data: deletedLoans,
+            error: deleteError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .delete()
+                .eq('id', collectionId)
+                .eq('status', 'settled')
+                .select('id');
+
+
+        if (deleteError) {
+
+            console.error(
+                'Delete collection error:',
+                deleteError
+            );
+
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to delete collection.'
+            });
+
+        }
+
+
+        // ==========================================
+        // CHECK WHETHER LOAN EXISTED
+        // ==========================================
+
+        if (
+            !deletedLoans ||
+            deletedLoans.length === 0
+        ) {
+
+            return res.status(404).json({
+                success: false,
+                message:
+                    'Collection not found.'
+            });
+
+        }
+
+
+        // ==========================================
+        // SUCCESS
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            message:
+                'Collection deleted successfully.'
+
+        });
+
+    }
+    catch (error) {
+
+        console.error(
+            'Delete collection error:',
+            error
+        );
+
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while deleting the collection.'
+        });
+
+    }
+
+});
+
+
+// collections details page
+app.get('/collections/details', (req, res) => {
+    res.sendFile(
+        path.join(
+            __dirname,
+            'src',
+            'public',
+            'html',
+            'collection-details.html'
+        )
+    );
+});
+
+// =============================
+// GET SINGLE COLLECTION (settled loan + installments)
+// =============================
+
+app.get('/api/collections/:id', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET SETTLED LOAN
+        // ==========================================
+
+        const loanId =
+            req.params.id;
+
+
+        const {
+            data: loan,
+            error: loanError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .select(`
+                    id,
+                    principal_amount,
+                    total_repayment,
+                    start_date,
+                    settlement_date,
+                    status,
+                    borrower_id,
+                    borrowers (
+                        first_name,
+                        last_name,
+                        phone
+                    )
+                `)
+                .eq('id', loanId)
+                .eq('status', 'settled')
+                .single();
+
+
+        if (
+            loanError ||
+            !loan
+        ) {
+
+            console.error(
+                'Collection lookup error:',
+                loanError
+            );
+
+            return res.status(404).json({
+                success: false,
+                message:
+                    'Collection not found.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET PAYMENT HISTORY
+        // ==========================================
+
+        const {
+            data: installments,
+            error: installmentsError
+        } =
+            await authenticatedSupabase
+                .from('loan_installments')
+                .select('id, installment_number, amount_paid, paid_date')
+                .eq('loan_id', loanId)
+                .order('installment_number', {
+                    ascending: true
+                });
+
+
+        if (installmentsError) {
+
+            console.error(
+                'Installments fetch error:',
+                installmentsError
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to load payment history.'
+            });
+
+        }
+
+
+        // ==========================================
+        // SUCCESS
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            loan,
+
+            installments:
+                installments || []
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            'Get collection error:',
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while loading the collection.'
+        });
+
+    }
+
+});
+
+
 // =============================
 // START SERVER
 // =============================
