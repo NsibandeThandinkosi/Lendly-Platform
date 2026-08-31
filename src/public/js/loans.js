@@ -4,180 +4,10 @@
 
 
 // ============================================================
-// HARD-CODED LOAN DATA
+// STATE
 // ============================================================
 
-const defaultLoans = [
-
-    {
-        id: "LN-1024",
-
-        borrower: "John Mokoena",
-
-        phone: "+27 71 234 5678",
-
-        amount: 5000,
-
-        remaining: 3500,
-
-        monthlyPayment: 500,
-
-        nextDueDate: "2026-08-10",
-
-        startDate: "2026-04-10",
-
-        term: 12,
-
-        interestRate: 10,
-
-        purpose: "Personal expenses",
-
-        status: "active"
-    },
-
-
-    {
-        id: "LN-1021",
-
-        borrower: "Lerato Maseko",
-
-        phone: "+27 72 345 6789",
-
-        amount: 8000,
-
-        remaining: 6000,
-
-        monthlyPayment: 800,
-
-        nextDueDate: "2026-08-05",
-
-        startDate: "2026-03-05",
-
-        term: 12,
-
-        interestRate: 12,
-
-        purpose: "Business expenses",
-
-        status: "active"
-    },
-
-
-    {
-        id: "LN-1030",
-
-        borrower: "Thabo Molefe",
-
-        phone: "+27 73 456 7890",
-
-        amount: 3200,
-
-        remaining: 2400,
-
-        monthlyPayment: 400,
-
-        nextDueDate: "2026-08-20",
-
-        startDate: "2026-06-20",
-
-        term: 8,
-
-        interestRate: 8,
-
-        purpose: "School expenses",
-
-        status: "active"
-    },
-
-
-    {
-        id: "LN-1019",
-
-        borrower: "Sarah Ndlovu",
-
-        phone: "+27 74 567 8901",
-
-        amount: 12000,
-
-        remaining: 9000,
-
-        monthlyPayment: 1000,
-
-        nextDueDate: "2026-07-25",
-
-        startDate: "2026-02-25",
-
-        term: 12,
-
-        interestRate: 10,
-
-        purpose: "Home improvement",
-
-        status: "active"
-    },
-
-
-    {
-        id: "LN-1028",
-
-        borrower: "Sipho Dlamini",
-
-        phone: "+27 75 678 9012",
-
-        amount: 6500,
-
-        remaining: 5200,
-
-        monthlyPayment: 650,
-
-        nextDueDate: "2026-08-28",
-
-        startDate: "2026-05-28",
-
-        term: 10,
-
-        interestRate: 9,
-
-        purpose: "Vehicle expenses",
-
-        status: "active"
-    }
-
-];
-
-
-
-// ============================================================
-// LOAD LOANS
-// ============================================================
-
-let loans =
-    JSON.parse(
-        localStorage.getItem("lendlyLoans")
-    );
-
-
-if (!loans) {
-
-    loans = defaultLoans;
-
-    saveLoans();
-
-}
-
-
-// ============================================================
-// SAVE LOANS
-// ============================================================
-
-function saveLoans() {
-
-    localStorage.setItem(
-        "lendlyLoans",
-        JSON.stringify(loans)
-    );
-
-}
+let loans = [];
 
 
 // ============================================================
@@ -201,6 +31,217 @@ const notificationButton =
 
 const profileButton =
     document.getElementById("profileButton");
+
+
+// ============================================================
+// AUTHENTICATION
+// ============================================================
+
+function getAccessToken() {
+
+    const storedSession =
+        localStorage.getItem(
+            "lendlySession"
+        );
+
+    if (!storedSession) {
+
+        return null;
+
+    }
+
+    try {
+
+        const session =
+            JSON.parse(
+                storedSession
+            );
+
+        return (
+            session.access_token ||
+            null
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Unable to read session:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+// ============================================================
+// LOAD LOANS FROM SERVER
+// ============================================================
+
+async function loadLoans() {
+
+    const accessToken =
+        getAccessToken();
+
+
+    if (!accessToken) {
+
+        window.location.href =
+            "/login";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/loans/active",
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Load loans error:",
+                result
+            );
+
+
+            if (
+                response.status === 401
+            ) {
+
+                localStorage.removeItem(
+                    "lendlySession"
+                );
+
+                localStorage.removeItem(
+                    "lendlyUser"
+                );
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            loansList.style.display =
+                "none";
+
+            loansEmpty.style.display =
+                "block";
+
+            loansEmpty.textContent =
+                result.message ||
+                "Unable to load loans.";
+
+            return;
+
+        }
+
+
+        /*
+            Map server rows into the shape
+            the rest of this file expects.
+        */
+
+        loans =
+            (result.loans || []).map(
+                function(loan) {
+
+                    const borrowerName =
+                        loan.borrowers
+                            ? `${loan.borrowers.first_name} ${loan.borrowers.last_name}`
+                            : "Unknown borrower";
+
+
+                    const borrowerPhone =
+                        loan.borrowers
+                            ? loan.borrowers.phone
+                            : "";
+
+
+                    return {
+
+                        id:
+                            loan.id,
+
+                        borrower:
+                            borrowerName,
+
+                        phone:
+                            borrowerPhone,
+
+                        amount:
+                            loan.principal_amount,
+
+                        remaining:
+                            loan.remaining_amount,
+
+                        monthlyPayment:
+                            loan.monthly_payment,
+
+                        nextDueDate:
+                            loan.next_due_date,
+
+                        startDate:
+                            loan.start_date,
+
+                        term:
+                            loan.duration_months,
+
+                        interestRate:
+                            loan.interest_rate,
+
+                        status:
+                            loan.status
+
+                    };
+
+                }
+            );
+
+
+        renderLoans();
+
+    } catch (error) {
+
+        console.error(
+            "Load loans request failed:",
+            error
+        );
+
+        loansList.style.display =
+            "none";
+
+        loansEmpty.style.display =
+            "block";
+
+        loansEmpty.textContent =
+            "Unable to connect to the server.";
+
+    }
+
+}
 
 
 // ============================================================
@@ -405,7 +446,8 @@ function renderLoans() {
     const activeLoans =
         loans.filter(
             loan =>
-                loan.status === "active"
+                loan.status === "active" ||
+                loan.status === "overdue"
         );
 
 
@@ -503,7 +545,7 @@ function renderLoans() {
                         </strong>
 
                         <span>
-                            ${loan.id}
+                            ${loan.phone}
                         </span>
 
                     </div>
@@ -605,18 +647,6 @@ function renderLoans() {
                         Clear Loan
                     </button>
 
-
-                    <button
-                        class="
-                            loan-action-button
-                            edit
-                        "
-                        data-action="edit"
-                        data-id="${loan.id}"
-                    >
-                        Edit
-                    </button>
-
                 </div>
 
             `;
@@ -633,194 +663,12 @@ function renderLoans() {
 
 
 // ============================================================
-// ADD ONE MONTH TO NEXT PAYMENT
-// ============================================================
-
-function movePaymentToNextMonth(
-    loan
-) {
-
-    const currentDate =
-        new Date(
-            loan.nextDueDate + "T00:00:00"
-        );
-
-
-    const originalDay =
-        currentDate.getDate();
-
-
-    currentDate.setMonth(
-        currentDate.getMonth() + 1
-    );
-
-
-    /*
-       Handle months with fewer days.
-
-       Example:
-       31 August -> 30 September
-    */
-
-    if (
-        currentDate.getDate() !==
-        originalDay
-    ) {
-
-        currentDate.setDate(0);
-
-    }
-
-
-    const year =
-        currentDate.getFullYear();
-
-
-    const month =
-        String(
-            currentDate.getMonth() + 1
-        ).padStart(2, "0");
-
-
-    const day =
-        String(
-            currentDate.getDate()
-        ).padStart(2, "0");
-
-
-    loan.nextDueDate =
-        `${year}-${month}-${day}`;
-
-}
-
-
-// ============================================================
-// MONTHLY PAYMENT
-// ============================================================
-
-function recordMonthlyPayment(
-    loanId
-) {
-
-    const loan =
-        loans.find(
-            item =>
-                item.id === loanId
-        );
-
-
-    if (!loan) {
-        return;
-    }
-
-
-    const confirmed =
-        confirm(
-            `Record the monthly payment of ${formatMoney(
-                loan.monthlyPayment
-            )} from ${loan.borrower}?`
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    /*
-       Reduce remaining balance.
-
-       This assumes the hard-coded monthly
-       payment goes directly against the
-       remaining balance for now.
-    */
-
-    loan.remaining =
-        Math.max(
-            0,
-            loan.remaining -
-            loan.monthlyPayment
-        );
-
-
-    movePaymentToNextMonth(
-        loan
-    );
-
-
-    saveLoans();
-
-    renderLoans();
-
-}
-
-
-// ============================================================
-// CLEAR LOAN
-// ============================================================
-
-function clearLoan(
-    loanId
-) {
-
-    const loan =
-        loans.find(
-            item =>
-                item.id === loanId
-        );
-
-
-    if (!loan) {
-        return;
-    }
-
-
-    const confirmed =
-        confirm(
-            `Mark ${loan.borrower}'s loan ${loan.id} as fully paid and collected?`
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    /*
-       Change status to collected.
-
-       It will no longer appear on this page
-       because this page only shows active loans.
-    */
-
-    loan.status =
-        "collected";
-
-
-    loan.remaining =
-        0;
-
-
-    loan.clearedDate =
-        new Date()
-            .toISOString()
-            .split("T")[0];
-
-
-    saveLoans();
-
-    renderLoans();
-
-}
-
-
-// ============================================================
 // BUTTON HANDLER
 // ============================================================
 
 loansList.addEventListener(
     "click",
-    function(event) {
+    async function(event) {
 
         const button =
             event.target.closest(
@@ -851,7 +699,7 @@ loansList.addEventListener(
         ) {
 
             window.location.href =
-                `loan-details.html?id=${loanId}`;
+                `/loans/details?id=${loanId}`;
 
             return;
 
@@ -867,9 +715,111 @@ loansList.addEventListener(
             "payment"
         ) {
 
-            recordMonthlyPayment(
-                loanId
-            );
+            const accessToken =
+                getAccessToken();
+
+
+            if (!accessToken) {
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            const selectedLoan =
+                loans.find(
+                    loan =>
+                        loan.id === loanId
+                );
+
+
+            if (!selectedLoan) {
+
+                alert(
+                    "Loan could not be found."
+                );
+
+                return;
+
+            }
+
+
+            const paymentAmount =
+                Math.min(
+                    Number(selectedLoan.remaining),
+                    Number(selectedLoan.monthlyPayment)
+                );
+
+
+            const confirmed =
+                confirm(
+                    `Record a monthly payment of ${formatMoney(
+                        paymentAmount
+                    )}?`
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `/api/loans/${loanId}/payment`,
+                        {
+                            method: "PATCH",
+
+                            headers: {
+                                Authorization:
+                                    `Bearer ${accessToken}`
+                            }
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    alert(
+                        result.message ||
+                        "Unable to record payment."
+                    );
+
+                    return;
+
+                }
+
+
+                alert(
+                    result.message
+                );
+
+
+                await loadLoans();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Monthly payment error:",
+                    error
+                );
+
+                alert(
+                    "Unable to connect to the server."
+                );
+
+            }
+
 
             return;
 
@@ -885,26 +835,106 @@ loansList.addEventListener(
             "clear"
         ) {
 
-            clearLoan(
-                loanId
-            );
+            const accessToken =
+                getAccessToken();
+
+
+            if (!accessToken) {
+
+                window.location.href =
+                    "/login";
+
+                return;
+
+            }
+
+
+            const selectedLoan =
+                loans.find(
+                    loan =>
+                        loan.id === loanId
+                );
+
+
+            if (!selectedLoan) {
+
+                alert(
+                    "Loan could not be found."
+                );
+
+                return;
+
+            }
+
+
+            const confirmed =
+                confirm(
+                    `Clear this loan by paying the remaining balance of ${formatMoney(
+                        selectedLoan.remaining
+                    )}?`
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `/api/loans/${loanId}/clear`,
+                        {
+                            method: "PATCH",
+
+                            headers: {
+                                Authorization:
+                                    `Bearer ${accessToken}`
+                            }
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    alert(
+                        result.message ||
+                        "Unable to clear loan."
+                    );
+
+                    return;
+
+                }
+
+
+                alert(
+                    result.message
+                );
+
+
+                await loadLoans();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Clear loan error:",
+                    error
+                );
+
+                alert(
+                    "Unable to connect to the server."
+                );
+
+            }
+
 
             return;
-
-        }
-
-
-        // -------------------------
-        // EDIT
-        // -------------------------
-
-        if (
-            action ===
-            "edit"
-        ) {
-
-            window.location.href =
-                `loan-details.html?id=${loanId}&edit=true`;
 
         }
 
@@ -941,7 +971,7 @@ profileButton.addEventListener(
 
 
 // ============================================================
-// INITIAL RENDER
+// INITIAL LOAD
 // ============================================================
 
-renderLoans();
+loadLoans();
