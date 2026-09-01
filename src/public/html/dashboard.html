@@ -1,49 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Loan Dashboard</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="../css/innerStyle.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
+    <title>Loan Dashboard - Lendly</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/innerStyle.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/dashboard.css"
+    >
+
 </head>
+
 
 <body>
 
     <div class="dashboard-page">
 
-        <!-- =========================
+
+        <!-- ==================================================
              SIDEBAR
-        ========================== -->
+        =================================================== -->
 
         <aside class="sidebar">
 
-            <!-- Lendly Logo -->
-            <a href="/dashboard"
-             class="logo">
-                <span class="logo-icon">L</span>
+            <a
+                href="/dashboard"
+                class="logo"
+            >
+
+                <span class="logo-icon">
+                    L
+                </span>
+
                 Lendly
+
             </a>
 
 
-            <!-- Navigation -->
             <nav class="sidebar-nav">
 
-                <a href="/loans" class="nav-item">
-                    <span class="nav-icon">↗</span>
+                <a
+                    href="/loans"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ↗
+                    </span>
+
                     Loans
+
                 </a>
 
-                <a href="/collections" class="nav-item">
-                    <span class="nav-icon">✓</span>
+
+                <a
+                    href="/collections"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ✓
+                    </span>
+
                     Collections
+
                 </a>
 
-                <a href="/borrowers" class="nav-item">
-                    <span class="nav-icon">♙</span>
+
+                <a
+                    href="/borrowers"
+                    class="nav-item"
+                >
+
+                    <span class="nav-icon">
+                        ♙
+                    </span>
+
                     Borrowers
+
                 </a>
 
             </nav>
@@ -51,17 +98,22 @@
         </aside>
 
 
-        <!-- =========================
+
+        <!-- ==================================================
              MAIN CONTENT
-        ========================== -->
+        =================================================== -->
 
         <main class="main-content">
 
-            <!-- TOP BAR -->
+
+            <!-- ==================================================
+                 TOP BAR
+            =================================================== -->
 
             <header class="topbar">
 
                 <div>
+
                     <p class="page-label">
                         Overview
                     </p>
@@ -69,6 +121,7 @@
                     <h1>
                         Loan Dashboard
                     </h1>
+
                 </div>
 
 
@@ -77,24 +130,34 @@
                     <button
                         class="notification-button"
                         id="notificationButton"
+                        type="button"
+                        aria-label="Notifications"
                     >
                         ♧
                     </button>
 
-                    <button class="user-profile" id="profileButton">
+
+                    <button
+                        class="user-profile"
+                        id="profileButton"
+                        type="button"
+                    >
 
                         <div class="user-avatar">
-                            TN
+                            --
                         </div>
 
+
                         <div>
-                            <strong>
-                                Admin
+
+                            <strong id="profileName">
+                                Account
                             </strong>
 
                             <span>
                                 Loan Manager
                             </span>
+
                         </div>
 
                     </button>
@@ -104,18 +167,90 @@
             </header>
 
 
-            <!-- =========================
+
+            <!-- ==================================================
                  DASHBOARD CONTENT
-            ========================== -->
+            =================================================== -->
 
             <section class="dashboard-content">
 
 
-                <!-- =========================
-                     SUMMARY CARDS
-                ========================== -->
+                <!-- ==================================================
+                     NO BORROWERS STATE
+                =================================================== -->
 
-                <div class="summary-grid">
+                <section
+                    class="dashboard-empty-state"
+                    id="noBorrowersState"
+                    hidden
+                >
+
+                    <div class="empty-state-icon">
+                        ♙
+                    </div>
+
+                    <h2>
+                        You don't have any borrowers yet
+                    </h2>
+
+                    <p>
+                        Add your first borrower to start managing
+                        loans with Lendly.
+                    </p>
+
+                    <a
+                        href="/borrowers/create"
+                        class="empty-state-button"
+                    >
+                        Add borrower
+                    </a>
+
+                </section>
+
+
+
+                <!-- ==================================================
+                     NO LOANS STATE
+                =================================================== -->
+
+                <section
+                    class="dashboard-empty-state"
+                    id="noLoansState"
+                    hidden
+                >
+
+                    <div class="empty-state-icon">
+                        ↗
+                    </div>
+
+                    <h2>
+                        You don't have any loans yet
+                    </h2>
+
+                    <p>
+                        Once you create a loan for one of your
+                        borrowers, it will appear on your dashboard.
+                    </p>
+
+                    <a
+                        href="/loans"
+                        class="empty-state-button"
+                    >
+                        View loans
+                    </a>
+
+                </section>
+
+
+
+                <!-- ==================================================
+                     SUMMARY CARDS
+                =================================================== -->
+
+                <div
+                    class="summary-grid"
+                    id="summaryGrid"
+                >
 
 
                     <!-- TOTAL LENT -->
@@ -125,14 +260,17 @@
                         <div class="summary-top">
 
                             <div>
+
                                 <p>
                                     Total lent
                                 </p>
 
                                 <h2 id="totalLent">
-                                    R25 480
+                                    R0
                                 </h2>
+
                             </div>
+
 
                             <div class="summary-icon blue">
                                 ↗
@@ -143,8 +281,11 @@
 
                         <div class="summary-bottom">
 
-                            <span class="positive">
-                                ↗ 12.8%
+                            <span
+                                id="growth"
+                                class="positive"
+                            >
+                                0%
                             </span>
 
                             <span>
@@ -156,11 +297,14 @@
                     </div>
 
 
+
                     <!-- ACTIVE LOANS -->
 
                     <div
                         class="summary-card clickable"
                         id="activeLoansCard"
+                        role="button"
+                        tabindex="0"
                     >
 
                         <div class="summary-top">
@@ -172,7 +316,7 @@
                                 </p>
 
                                 <h2 id="activeLoans">
-                                    24
+                                    0
                                 </h2>
 
                             </div>
@@ -196,11 +340,14 @@
                     </div>
 
 
+
                     <!-- COLLECTED -->
 
                     <div
                         class="summary-card clickable"
                         id="collectedCard"
+                        role="button"
+                        tabindex="0"
                     >
 
                         <div class="summary-top">
@@ -212,7 +359,7 @@
                                 </p>
 
                                 <h2 id="collected">
-                                    R18.2k
+                                    R0
                                 </h2>
 
                             </div>
@@ -227,8 +374,11 @@
 
                         <div class="summary-bottom">
 
-                            <span class="positive">
-                                82%
+                            <span
+                                id="collectionRateCard"
+                                class="positive"
+                            >
+                                0%
                             </span>
 
                             <span>
@@ -238,6 +388,7 @@
                         </div>
 
                     </div>
+
 
 
                     <!-- OUTSTANDING -->
@@ -253,7 +404,7 @@
                                 </p>
 
                                 <h2 id="outstanding">
-                                    R7.28k
+                                    R0
                                 </h2>
 
                             </div>
@@ -279,14 +430,20 @@
                 </div>
 
 
-                <!-- =========================
+
+                <!-- ==================================================
                      LOWER DASHBOARD
-                ========================== -->
+                =================================================== -->
 
-                <div class="dashboard-grid">
+                <div
+                    class="dashboard-grid"
+                    id="dashboardGrid"
+                >
 
 
-                    <!-- COLLECTION PROGRESS -->
+                    <!-- ==================================================
+                         COLLECTION PROGRESS
+                    =================================================== -->
 
                     <section class="panel collection-panel">
 
@@ -305,11 +462,12 @@
                             </div>
 
 
-                                <button id="detailsButton"
-                                    onclick="window.location.href='/collections'"
-                                >
-                                    View details
-                                </button>
+                            <button
+                                id="detailsButton"
+                                type="button"
+                            >
+                                View details
+                            </button>
 
                         </div>
 
@@ -319,7 +477,7 @@
                             <div class="progress-info">
 
                                 <strong id="progressText">
-                                    82%
+                                    0%
                                 </strong>
 
                                 <span>
@@ -347,8 +505,8 @@
                                         Collected
                                     </span>
 
-                                    <strong>
-                                        R18.2k
+                                    <strong id="collectedProgress">
+                                        R0
                                     </strong>
 
                                 </div>
@@ -360,8 +518,8 @@
                                         Outstanding
                                     </span>
 
-                                    <strong>
-                                        R7.28k
+                                    <strong id="outstandingProgress">
+                                        R0
                                     </strong>
 
                                 </div>
@@ -373,7 +531,10 @@
                     </section>
 
 
-                    <!-- Live LOANS -->
+
+                    <!-- ==================================================
+                         LIVE LOANS
+                    =================================================== -->
 
                     <section class="panel">
 
@@ -395,6 +556,7 @@
                             <button
                                 class="view-all-button"
                                 id="viewAllButton"
+                                type="button"
                             >
                                 View all
                             </button>
@@ -402,140 +564,14 @@
                         </div>
 
 
-                        <div class="loan-list">
+                        <div
+                            class="loan-list"
+                            id="loanList"
+                        >
 
-
-                            <div class="loan-item">
-
-                                <div class="borrower-avatar">
-                                    JM
-                                </div>
-
-                                <div class="loan-info">
-
-                                    <strong>
-                                        John Mokoena
-                                    </strong>
-
-                                    <span>
-                                        Loan #LN-1024
-                                    </span>
-
-                                </div>
-
-                                <div class="loan-amount">
-
-                                    <strong>
-                                        R2,500
-                                    </strong>
-
-                                    <span class="status overdue">
-                                        Overdue
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="loan-item">
-
-                                <div class="borrower-avatar">
-                                    SN
-                                </div>
-
-                                <div class="loan-info">
-
-                                    <strong>
-                                        Sarah Ndlovu
-                                    </strong>
-
-                                    <span>
-                                        Loan #LN-1023
-                                    </span>
-
-                                </div>
-
-                                <div class="loan-amount">
-
-                                    <strong>
-                                        R1,800
-                                    </strong>
-
-                                    <span class="status active">
-                                        Active
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="loan-item">
-
-                                <div class="borrower-avatar">
-                                    TM
-                                </div>
-
-                                <div class="loan-info">
-
-                                    <strong>
-                                        Thabo Molefe
-                                    </strong>
-
-                                    <span>
-                                        Loan #LN-1022
-                                    </span>
-
-                                </div>
-
-                                <div class="loan-amount">
-
-                                    <strong>
-                                        R3,200
-                                    </strong>
-
-                                    <span class="status active">
-                                        Active
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="loan-item">
-
-                                <div class="borrower-avatar">
-                                    LM
-                                </div>
-
-                                <div class="loan-info">
-
-                                    <strong>
-                                        Lerato Maseko
-                                    </strong>
-
-                                    <span>
-                                        Loan #LN-1021
-                                    </span>
-
-                                </div>
-
-                                <div class="loan-amount">
-
-                                    <strong>
-                                        R1,250
-                                    </strong>
-
-                                    <span class="status active">
-                                        Active
-                                    </span>
-
-                                </div>
-
-                            </div>
-
+                            <!--
+                                dashboard.js will populate this.
+                            -->
 
                         </div>
 
@@ -544,12 +580,17 @@
                 </div>
 
 
-                <!-- MESSAGE -->
+
+                <!-- ==================================================
+                     DASHBOARD MESSAGE
+                =================================================== -->
 
                 <div
                     class="dashboard-message"
                     id="dashboardMessage"
+                    aria-live="polite"
                 ></div>
+
 
             </section>
 
@@ -558,7 +599,10 @@
     </div>
 
 
+
     <script src="../js/dashboard.js"></script>
 
 </body>
+
 </html>
+

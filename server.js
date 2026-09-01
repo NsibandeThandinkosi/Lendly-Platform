@@ -3174,6 +3174,764 @@ app.get('/api/collections/:id', async (req, res) => {
 });
 
 
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+
+// collections details page
+app.get('/dashboard', (req, res) => {
+    res.sendFile(
+        path.join(
+            __dirname,
+            'src',
+            'public',
+            'html',
+            'dashboard.html'
+        )
+    );
+});
+
+
+// ============================================================
+// DASHBOARD DATA
+// ============================================================
+
+app.get('/api/dashboard', async (req, res) => {
+
+    try {
+
+        // ==========================================
+        // GET ACCESS TOKEN
+        // ==========================================
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (
+            !authHeader ||
+            !authHeader.startsWith('Bearer ')
+        ) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required.'
+            });
+
+        }
+
+
+        const accessToken =
+            authHeader
+                .replace('Bearer ', '')
+                .trim();
+
+
+        if (!accessToken) {
+
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid authentication token.'
+            });
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATED SUPABASE CLIENT
+        // ==========================================
+
+        const authenticatedSupabase =
+            createClient(
+                process.env.SUPABASE_URL,
+                process.env.SUPABASE_KEY,
+                {
+                    global: {
+                        headers: {
+                            Authorization:
+                                `Bearer ${accessToken}`
+                        }
+                    },
+
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        // ==========================================
+        // VERIFY USER
+        // ==========================================
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await authenticatedSupabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
+        ) {
+
+            console.error(
+                'Dashboard authentication error:',
+                userError
+            );
+
+
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Your session is invalid or expired.'
+            });
+
+        }
+
+
+        // ==========================================
+        // GET USER PROFILE
+        // ==========================================
+
+        const {
+            data: profile,
+            error: profileError
+        } =
+            await authenticatedSupabase
+                .from('profiles')
+                .select(
+                    'first_name, last_name'
+                )
+                .eq(
+                    'id',
+                    user.id
+                )
+                .single();
+
+
+        if (
+            profileError &&
+            profileError.code !== 'PGRST116'
+        ) {
+
+            console.error(
+                'Dashboard profile error:',
+                profileError
+            );
+
+        }
+
+
+        // ==========================================
+        // GET BORROWERS
+        // ==========================================
+
+        const {
+            data: borrowers,
+            error: borrowersError
+        } =
+            await authenticatedSupabase
+                .from('borrowers')
+                .select(
+                    'id, first_name, last_name, phone'
+                )
+                .eq(
+                    'lender_id',
+                    user.id
+                );
+
+
+        if (borrowersError) {
+
+            console.error(
+                'Dashboard borrowers error:',
+                borrowersError
+            );
+
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to load dashboard borrowers.'
+            });
+
+        }
+
+
+        const borrowerList =
+            borrowers || [];
+
+
+        // ==========================================
+        // GET LOANS
+        // ==========================================
+
+        const {
+            data: loans,
+            error: loansError
+        } =
+            await authenticatedSupabase
+                .from('loans')
+                .select(`
+                    id,
+                    lender_id,
+                    borrower_id,
+                    principal_amount,
+                    total_repayment,
+                    remaining_amount,
+                    status,
+                    start_date,
+                    next_due_date,
+                    created_at,
+                    borrowers (
+                        id,
+                        first_name,
+                        last_name,
+                        phone
+                    )
+                `)
+                .eq(
+                    'lender_id',
+                    user.id
+                )
+                .order(
+                    'created_at',
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (loansError) {
+
+            console.error(
+                'Dashboard loans error:',
+                loansError
+            );
+
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    'Unable to load dashboard loans.'
+            });
+
+        }
+
+
+        const loanList =
+            loans || [];
+
+
+        // ==========================================
+        // GET LOAN INSTALLMENTS
+        // ==========================================
+
+        const loanIds =
+            loanList.map(
+                loan => loan.id
+            );
+
+
+        let installments = [];
+
+
+        if (
+            loanIds.length > 0
+        ) {
+
+            const {
+                data,
+                error: installmentsError
+            } =
+                await authenticatedSupabase
+                    .from('loan_installments')
+                    .select(`
+                        id,
+                        loan_id,
+                        amount_paid,
+                        paid_date
+                    `)
+                    .in(
+                        'loan_id',
+                        loanIds
+                    );
+
+
+            if (installmentsError) {
+
+                console.error(
+                    'Dashboard installments error:',
+                    installmentsError
+                );
+
+
+                return res.status(500).json({
+                    success: false,
+                    message:
+                        'Unable to load loan payments.'
+                });
+
+            }
+
+
+            installments =
+                data || [];
+
+        }
+
+
+        // ==========================================
+        // TOTAL LENT
+        // ==========================================
+
+        const totalLent =
+            loanList.reduce(
+                (total, loan) => {
+
+                    return total +
+                        Number(
+                            loan.principal_amount || 0
+                        );
+
+                },
+                0
+            );
+
+
+        // ==========================================
+        // ACTIVE LOANS
+        // ==========================================
+
+        const activeLoans =
+            loanList.filter(
+                loan =>
+                    loan.status === 'active'
+            ).length;
+
+
+        // ==========================================
+        // TOTAL REPAYMENT
+        // ==========================================
+
+        const totalRepayment =
+            loanList.reduce(
+                (total, loan) => {
+
+                    return total +
+                        Number(
+                            loan.total_repayment || 0
+                        );
+
+                },
+                0
+            );
+
+
+        // ==========================================
+        // TOTAL COLLECTED
+        // ==========================================
+
+        const collected =
+            installments.reduce(
+                (total, installment) => {
+
+                    return total +
+                        Number(
+                            installment.amount_paid || 0
+                        );
+
+                },
+                0
+            );
+
+
+        // ==========================================
+        // OUTSTANDING
+        // ==========================================
+
+        const outstanding =
+            Math.max(
+                totalRepayment - collected,
+                0
+            );
+
+
+        // ==========================================
+        // COLLECTION RATE
+        // ==========================================
+
+        let collectionRate = 0;
+
+
+        if (
+            totalRepayment > 0
+        ) {
+
+            collectionRate =
+                (
+                    collected /
+                    totalRepayment
+                ) * 100;
+
+        }
+
+
+        collectionRate =
+            Number(
+                collectionRate.toFixed(1)
+            );
+
+
+        // ==========================================
+        // MONTHLY GROWTH
+        // ==========================================
+
+        const now =
+            new Date();
+
+
+        const currentMonthStart =
+            new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            );
+
+
+        const previousMonthStart =
+            new Date(
+                now.getFullYear(),
+                now.getMonth() - 1,
+                1
+            );
+
+
+        const currentMonthLent =
+            loanList
+                .filter(
+                    loan => {
+
+                        if (
+                            !loan.start_date
+                        ) {
+
+                            return false;
+
+                        }
+
+
+                        const date =
+                            new Date(
+                                `${loan.start_date}T00:00:00`
+                            );
+
+
+                        return (
+                            date >=
+                                currentMonthStart
+                        );
+
+                    }
+                )
+                .reduce(
+                    (total, loan) => {
+
+                        return total +
+                            Number(
+                                loan.principal_amount || 0
+                            );
+
+                    },
+                    0
+                );
+
+
+        const previousMonthLent =
+            loanList
+                .filter(
+                    loan => {
+
+                        if (
+                            !loan.start_date
+                        ) {
+
+                            return false;
+
+                        }
+
+
+                        const date =
+                            new Date(
+                                `${loan.start_date}T00:00:00`
+                            );
+
+
+                        return (
+                            date >=
+                                previousMonthStart &&
+                            date <
+                                currentMonthStart
+                        );
+
+                    }
+                )
+                .reduce(
+                    (total, loan) => {
+
+                        return total +
+                            Number(
+                                loan.principal_amount || 0
+                            );
+
+                    },
+                    0
+                );
+
+
+        let growth = 0;
+
+
+        if (
+            previousMonthLent > 0
+        ) {
+
+            growth =
+                (
+                    (
+                        currentMonthLent -
+                        previousMonthLent
+                    ) /
+                    previousMonthLent
+                ) * 100;
+
+        }
+        else if (
+            currentMonthLent > 0
+        ) {
+
+            /*
+                There was no lending in the previous
+                month, so there isn't a meaningful
+                percentage comparison.
+            */
+
+            growth = 100;
+
+        }
+
+
+        growth =
+            Number(
+                growth.toFixed(1)
+            );
+
+
+        // ==========================================
+        // LIVE LOANS
+        // ==========================================
+
+        const liveLoans =
+            loanList
+                .filter(
+                    loan =>
+                        loan.status === 'active' ||
+                        loan.status === 'overdue'
+                )
+                .slice(
+                    0,
+                    5
+                )
+                .map(
+                    loan => ({
+
+                        id:
+                            loan.id,
+
+                        principal_amount:
+                            Number(
+                                loan.principal_amount || 0
+                            ),
+
+                        remaining_amount:
+                            Number(
+                                loan.remaining_amount || 0
+                            ),
+
+                        total_repayment:
+                            Number(
+                                loan.total_repayment || 0
+                            ),
+
+                        status:
+                            loan.status,
+
+                        start_date:
+                            loan.start_date,
+
+                        next_due_date:
+                            loan.next_due_date,
+
+                        borrower:
+                            loan.borrowers || null
+
+                    })
+                );
+
+
+        // ==========================================
+        // PROFILE INFORMATION
+        // ==========================================
+
+        const firstName =
+            profile?.first_name ||
+            "";
+
+
+        const lastName =
+            profile?.last_name ||
+            "";
+
+
+        const profileDisplayName =
+            `${firstName} ${lastName}`.trim() ||
+            user.email ||
+            "Account";
+
+
+        const profileInitials =
+            getDashboardInitials(
+                firstName,
+                lastName,
+                user.email
+            );
+
+
+        // ==========================================
+        // RESPONSE
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            dashboard: {
+
+                borrowers:
+                    borrowerList.length,
+
+                loans:
+                    loanList.length,
+
+                totalLent:
+                    totalLent,
+
+                growth:
+                    growth,
+
+                activeLoans:
+                    activeLoans,
+
+                collected:
+                    collected,
+
+                outstanding:
+                    outstanding,
+
+                collectionRate:
+                    collectionRate,
+
+                liveLoans:
+                    liveLoans,
+
+                profileName:
+                    profileDisplayName,
+
+                profileInitials:
+                    profileInitials
+
+            }
+
+        });
+
+
+    }
+    catch (error) {
+
+        console.error(
+            'Dashboard error:',
+            error
+        );
+
+
+        return res.status(500).json({
+            success: false,
+            message:
+                'Something went wrong while loading the dashboard.'
+        });
+
+    }
+
+});
+
+
+// ============================================================
+// DASHBOARD PROFILE INITIALS
+// ============================================================
+
+function getDashboardInitials(
+    firstName,
+    lastName,
+    email
+) {
+
+    if (
+        firstName &&
+        lastName
+    ) {
+
+        return (
+            firstName[0] +
+            lastName[0]
+        ).toUpperCase();
+
+    }
+
+
+    if (
+        firstName
+    ) {
+
+        return firstName
+            .substring(0, 2)
+            .toUpperCase();
+
+    }
+
+
+    if (
+        email
+    ) {
+
+        return email
+            .substring(0, 2)
+            .toUpperCase();
+
+    }
+
+
+    return "--";
+
+}
+
+
+
 // =============================
 // START SERVER
 // =============================
