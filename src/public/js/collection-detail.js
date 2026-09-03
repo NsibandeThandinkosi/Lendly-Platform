@@ -30,12 +30,6 @@ const loanId =
 // ELEMENTS
 // ============================================================
 
-const notificationButton =
-    document.getElementById("notificationButton");
-
-const profileButton =
-    document.getElementById("profileButton");
-
 const deleteRecordButton =
     document.getElementById("deleteRecordButton");
 
@@ -574,44 +568,6 @@ if (deleteRecordButton) {
                     false;
 
             }
-
-        }
-    );
-
-}
-
-
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-
-if (notificationButton) {
-
-    notificationButton.addEventListener(
-        "click",
-        function() {
-
-            window.location.href =
-                "/notifications";
-
-        }
-    );
-
-}
-
-
-// ============================================================
-// USER PROFILE
-// ============================================================
-
-if (profileButton) {
-
-    profileButton.addEventListener(
-        "click",
-        function() {
-
-            window.location.href =
-                "/profile";
 
         }
     );

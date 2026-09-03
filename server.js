@@ -1047,7 +1047,7 @@ app.get('/api/borrowers/:id', async (req, res) => {
                         loan.next_due_date,
 
                     settlementDate:
-                        null
+                        loan.settlement_date
 
                 })
             );
@@ -1836,6 +1836,24 @@ app.get('/api/loans/active', async (req, res) => {
 
         }
 
+        // ==========================================
+        // MARK OVERDUE LOANS
+        // ==========================================
+
+        const {
+            error: overdueError
+        } = await authenticatedSupabase
+            .rpc('mark_overdue_loans');
+
+        if (overdueError) {
+
+            console.error(
+                'Mark overdue loans error:',
+                overdueError
+            );
+
+        }
+
 
         // ==========================================
         // GET ACTIVE LOANS WITH BORROWER INFO
@@ -1873,7 +1891,7 @@ app.get('/api/loans/active', async (req, res) => {
                         phone
                     )
                 `)
-                .eq('status', 'active')
+                .in('status', ['active', 'overdue'])
                 .order('next_due_date', {
                     ascending: true
                 });
@@ -3737,12 +3755,105 @@ app.get('/api/dashboard', async (req, res) => {
         // LIVE LOANS
         // ==========================================
 
+        const today =
+            new Date();
+
+        today.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
         const liveLoans =
             loanList
                 .filter(
                     loan =>
                         loan.status === 'active' ||
                         loan.status === 'overdue'
+                )
+                .sort(
+                    (a, b) => {
+
+                        // ==================================
+                        // OVERDUE FIRST
+                        // ==================================
+
+                        if (
+                            a.status === 'overdue' &&
+                            b.status !== 'overdue'
+                        ) {
+
+                            return -1;
+
+                        }
+
+
+                        if (
+                            a.status !== 'overdue' &&
+                            b.status === 'overdue'
+                        ) {
+
+                            return 1;
+
+                        }
+
+
+                        // ==================================
+                        // BOTH OVERDUE
+                        // ==================================
+
+                        if (
+                            a.status === 'overdue' &&
+                            b.status === 'overdue'
+                        ) {
+
+                            const aDue =
+                                new Date(
+                                    `${a.next_due_date}T00:00:00`
+                                );
+
+                            const bDue =
+                                new Date(
+                                    `${b.next_due_date}T00:00:00`
+                                );
+
+
+                            // Older due date = more overdue
+                            return aDue - bDue;
+
+                        }
+
+
+                        // ==================================
+                        // BOTH ACTIVE
+                        // ==================================
+
+                        const aDue =
+                            a.next_due_date
+                                ? new Date(
+                                    `${a.next_due_date}T00:00:00`
+                                )
+                                : new Date(
+                                    '9999-12-31T00:00:00'
+                                );
+
+
+                        const bDue =
+                            b.next_due_date
+                                ? new Date(
+                                    `${b.next_due_date}T00:00:00`
+                                )
+                                : new Date(
+                                    '9999-12-31T00:00:00'
+                                );
+
+
+                        // Nearest due date first
+                        return aDue - bDue;
+
+                    }
                 )
                 .slice(
                     0,
@@ -3930,7 +4041,101 @@ function getDashboardInitials(
 
 }
 
+// Profile page
+app.get('/profile', (req, res) => {
+    res.sendFile(
+        path.join(
+            __dirname,
+            'src',
+            'public',
+            'html',
+            'profile.html')
+    );
+});
 
+// =============================
+// GET PROFILE
+// =============================
+
+app.get('/api/profile', async (req, res) => {
+
+    try {
+
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required.'
+            });
+        }
+
+        const accessToken = authHeader.replace('Bearer ', '').trim();
+
+        if (!accessToken) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid authentication token.'
+            });
+        }
+
+        const authenticatedSupabase = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_KEY,
+            {
+                global: {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                },
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
+                }
+            }
+        );
+
+        const { data: { user }, error: userError } =
+            await authenticatedSupabase.auth.getUser();
+
+        if (userError || !user) {
+            console.error('Profile authentication error:', userError);
+            return res.status(401).json({
+                success: false,
+                message: 'Your session is invalid or expired.'
+            });
+        }
+
+        const { data: profile, error: profileError } = await authenticatedSupabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+        if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            return res.status(500).json({
+                success: false,
+                message: 'Unable to load profile.'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            profile: profile,
+            user: {
+                id: user.id,
+                email: user.email
+            }
+        });
+
+    } catch (error) {
+        console.error('Get profile error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Something went wrong while loading the profile.'
+        });
+    }
+
+});
 
 // =============================
 // START SERVER

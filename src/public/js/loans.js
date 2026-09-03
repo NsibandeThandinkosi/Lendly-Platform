@@ -26,13 +26,6 @@ const activeLoanCount =
 const overdueLoanCount =
     document.getElementById("overdueLoanCount");
 
-const notificationButton =
-    document.getElementById("notificationButton");
-
-const profileButton =
-    document.getElementById("profileButton");
-
-
 // ============================================================
 // AUTHENTICATION
 // ============================================================
@@ -940,34 +933,6 @@ loansList.addEventListener(
 
     }
 );
-
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-
-notificationButton.addEventListener(
-    "click",
-    function() {
-
-        window.location.href = "notifications.html";
-
-    }
-);
-
-
-// ============================================================
-// USER PROFILE
-// ============================================================
-
-profileButton.addEventListener(
-    "click",
-    function() {
-
-        window.location.href = "profile.html";
-
-    }
-);
-
 
 
 // ============================================================

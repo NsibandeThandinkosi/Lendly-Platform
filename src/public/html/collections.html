@@ -163,16 +163,6 @@
 
                 <div class="topbar-right">
 
-
-
-                    <!--Notifications-->
-                    <button
-                        class="notification-button"
-                        id="notificationButton"
-                    >
-                        ♧
-                    </button>
-                    
                     <!-- Profile -->
 
                     <button
@@ -180,18 +170,21 @@
                         id="profileButton"
                     >
 
-                        <div class="user-avatar">
-                            TN
+                        <div
+                            class="user-avatar"
+                            id="userAvatar"
+                        >
+                            --
                         </div>
 
                         <div>
 
-                            <strong>
-                                Themba Ngema
+                            <strong id="userName">
+                                Loading...
                             </strong>
 
                             <span>
-                                Account
+                                Loan Manager
                             </span>
 
                         </div>
@@ -293,8 +286,8 @@
 
 
     <!-- JAVASCRIPT -->
-
-    <script src="../js/collections.js"></script>
+    <script type="module" src="../js/user-profile.js"></script>
+    <script type="module" src="../js/collections.js"></script>
 
 
 </body>
