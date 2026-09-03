@@ -151,21 +151,24 @@
 
                     <button
                         class="user-profile"
-                        onclick="window.location.href='/profile'"
+                        id="profileButton"
                     >
 
-                        <div class="user-avatar">
-                            TN
+                        <div
+                            class="user-avatar"
+                            id="userAvatar"
+                        >
+                            --
                         </div>
 
                         <div>
 
-                            <strong>
-                                Thandinkosi
+                            <strong id="userName">
+                                Loading...
                             </strong>
 
                             <span>
-                                Account
+                                Loan Manager
                             </span>
 
                         </div>
@@ -270,8 +273,8 @@
     </div>
 
 
-
-    <script src="../js/borrowers.js"></script>
+    <script type="module" src="../js/user-profile.js"></script>
+    <script type="module" src="../js/borrowers.js"></script>
 
 </body>
 

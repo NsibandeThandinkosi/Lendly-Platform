@@ -46,9 +46,6 @@ const activeLoansCard =
 const collectedCard =
     document.getElementById("collectedCard");
 
-const notificationButton =
-    document.getElementById("notificationButton");
-
 const profileButton =
     document.getElementById("profileButton");
 
@@ -74,8 +71,44 @@ const dashboardGrid =
     document.getElementById("dashboardGrid");
 
 const profileName =
-    document.getElementById("profileName");
+    document.getElementById("userName");
 
+
+
+// ============================================================
+// DIAGNOSTIC: WARN ABOUT MISSING ELEMENTS
+// ============================================================
+
+const dashboardElements = {
+    totalLentElement,
+    growthElement,
+    activeLoansElement,
+    collectedElement,
+    outstandingElement,
+    progressTextElement,
+    progressElement,
+    collectedProgressElement,
+    outstandingProgressElement,
+    collectionRateCardElement,
+    detailsButton,
+    activeLoansCard,
+    collectedCard,
+    profileButton,
+    viewAllButton,
+    loanList,
+    dashboardMessage,
+    noBorrowersState,
+    noLoansState,
+    summaryGrid,
+    dashboardGrid,
+    profileName
+};
+
+Object.entries(dashboardElements).forEach(([name, element]) => {
+    if (!element) {
+        console.warn(`Dashboard: missing element in HTML for "${name}"`);
+    }
+});
 
 // ============================================================
 // FORMAT CURRENCY
@@ -492,7 +525,7 @@ function renderDashboard(
     // ==========================================
 
     renderLiveLoans(
-        dashboardData.liveLoans || []
+        (dashboardData.liveLoans || []).slice(0, 5)
     );
 
 }
@@ -969,25 +1002,6 @@ if (collectedCard) {
                 collectedCard.click();
 
             }
-
-        }
-    );
-
-}
-
-
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-
-if (notificationButton) {
-
-    notificationButton.addEventListener(
-        "click",
-        function() {
-
-            window.location.href =
-                "/notifications";
 
         }
     );

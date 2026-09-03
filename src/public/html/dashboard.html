@@ -126,32 +126,23 @@
 
 
                 <div class="topbar-right">
-
-                    <button
-                        class="notification-button"
-                        id="notificationButton"
-                        type="button"
-                        aria-label="Notifications"
-                    >
-                        ♧
-                    </button>
-
-
+                    <!--profile -->
                     <button
                         class="user-profile"
                         id="profileButton"
-                        type="button"
                     >
 
-                        <div class="user-avatar">
+                        <div
+                            class="user-avatar"
+                            id="userAvatar"
+                        >
                             --
                         </div>
 
-
                         <div>
 
-                            <strong id="profileName">
-                                Account
+                            <strong id="userName">
+                                Loading...
                             </strong>
 
                             <span>
@@ -599,8 +590,8 @@
     </div>
 
 
-
-    <script src="../js/dashboard.js"></script>
+    <script type="module" src="../js/user-profile.js"></script>
+    <script type="module" src="../js/dashboard.js"></script>
 
 </body>
 

@@ -23,11 +23,6 @@ const totalCollected =
 const totalLoans =
     document.getElementById("totalLoans");
 
-const notificationButton =
-    document.getElementById("notificationButton");
-
-const profileButton =
-    document.getElementById("profileButton");
 
 
 // ============================================================
@@ -747,36 +742,6 @@ async function deleteCollection(id) {
     }
 
 }
-
-
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-
-notificationButton.addEventListener(
-    "click",
-    function() {
-
-        window.location.href =
-            "notifications.html";
-
-    }
-);
-
-
-// ============================================================
-// USER PROFILE
-// ============================================================
-
-profileButton.addEventListener(
-    "click",
-    function() {
-
-        window.location.href =
-            "profile.html";
-
-    }
-);
 
 
 // ============================================================
