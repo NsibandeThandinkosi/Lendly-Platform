@@ -563,7 +563,7 @@ function displayLoans(loans) {
                     </span>
 
                     <strong>
-                        ${formatDate(date)}
+                        ${formatDate(loan.date)}
                     </strong>
 
                 </div>
